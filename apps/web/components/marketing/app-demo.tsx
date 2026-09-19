@@ -107,15 +107,15 @@ export function AppDemo({ locale }: { locale: Locale }) {
 
   return (
     <div
-      className="relative mx-auto flex w-[248px] flex-col rounded-[2.25rem] border-[6px] border-foreground/90 bg-foreground/90 p-1.5 shadow-2xl"
+      className="relative mx-auto flex w-[300px] flex-col rounded-[2.5rem] border-2 border-foreground/90 bg-foreground/90 p-1.5 shadow-2xl"
       role="group"
       aria-label={locale === "es" ? "Demo interactiva de la app" : "Interactive app demo"}
     >
       <div
         aria-hidden
-        className="absolute top-2.5 left-1/2 z-10 h-1.5 w-14 -translate-x-1/2 rounded-full bg-foreground/90"
+        className="absolute top-3 left-1/2 z-10 h-1.5 w-16 -translate-x-1/2 rounded-full bg-foreground/90"
       />
-      <div className="flex h-[476px] flex-col overflow-hidden rounded-[1.75rem] bg-card">
+      <div className="flex h-[580px] flex-col overflow-hidden rounded-[2.1rem] bg-card">
         <div className="flex items-center justify-between px-4 pt-6 pb-1">
           <span className="font-serif text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
             {t.appName}
@@ -309,10 +309,6 @@ export function AppDemo({ locale }: { locale: Locale }) {
           ))}
         </div>
       </div>
-
-      <p className="mt-2 text-center text-[9px] text-muted-foreground/80">
-        {locale === "es" ? "Datos de ejemplo. Nada se guarda." : "Sample data. Nothing is saved."}
-      </p>
     </div>
   );
 }

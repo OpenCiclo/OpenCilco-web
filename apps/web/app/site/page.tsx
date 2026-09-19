@@ -105,9 +105,9 @@ export default function SitePage() {
             </p>
           </div>
 
-            <div className="justify-self-center lg:justify-self-end">
-              <AppDemo locale={locale} />
-            </div>
+                <div className="flex w-full justify-center lg:justify-end lg:pb-0 lg:[margin-bottom:-2.5rem]">
+                  <AppDemo locale={locale} />
+                </div>
         </div>
       </section>
 
