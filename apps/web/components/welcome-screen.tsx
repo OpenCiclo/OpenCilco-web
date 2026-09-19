@@ -15,19 +15,18 @@ export function WelcomeScreen() {
 
   return (
     <div className="flex flex-col gap-6 pt-8">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">{t.appName}</p>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="font-serif text-4xl font-semibold tracking-tight">{t.appName}</h1>
         <button
           type="button"
-          className="text-sm underline"
+          className="inline-flex shrink-0 items-center rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted"
           onClick={() => setLocale(otherLocale(locale))}
         >
           {locale === "es" ? "EN" : "ES"}
         </button>
       </div>
       <div>
-        <h1 className="font-serif text-4xl font-semibold tracking-tight">{t.appName}</h1>
-        <p className="mt-2 text-lg text-muted-foreground">{t.tagline}</p>
+        <p className="text-lg text-muted-foreground">{t.tagline}</p>
         <p className="mt-3 text-sm text-muted-foreground">{t.welcomeCta}</p>
       </div>
       <Card className="border-primary/20 bg-primary/5 p-4 text-sm leading-6 text-muted-foreground">

@@ -43,24 +43,27 @@
 
 :root {
   color-scheme: light;
-  --background: oklch(0.98 0.012 20);
-  --foreground: oklch(0.33 0.05 12);
-  --card: oklch(0.995 0.006 30);
-  --card-foreground: oklch(0.33 0.05 12);
-  --popover: oklch(0.995 0.006 30);
-  --popover-foreground: oklch(0.33 0.05 12);
-  --primary: oklch(0.66 0.15 12);
-  --primary-foreground: oklch(0.99 0.008 20);
-  --secondary: oklch(0.93 0.03 45);
-  --secondary-foreground: oklch(0.42 0.07 25);
-  --muted: oklch(0.95 0.015 30);
-  --muted-foreground: oklch(0.55 0.045 15);
-  --accent: oklch(0.9 0.05 40);
-  --accent-foreground: oklch(0.4 0.08 20);
+  /* Neutral shell shared with the marketing/landing theme: white surfaces,
+     near-black primary, cool-gray text and borders. The cycle-semantic
+     colors below stay saturated so cycle data reads as the one accent. */
+  --background: oklch(0.985 0.002 260);
+  --foreground: oklch(0.24 0.006 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.006 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.006 260);
+  --primary: oklch(0.27 0.008 260);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.968 0.003 260);
+  --secondary-foreground: oklch(0.32 0.008 260);
+  --muted: oklch(0.968 0.003 260);
+  --muted-foreground: oklch(0.52 0.008 260);
+  --accent: oklch(0.962 0.003 260);
+  --accent-foreground: oklch(0.28 0.008 260);
   --destructive: oklch(0.58 0.2 20);
-  --border: oklch(0.9 0.02 25);
-  --input: oklch(0.92 0.018 25);
-  --ring: oklch(0.66 0.15 12);
+  --border: oklch(0.921 0.004 260);
+  --input: oklch(0.921 0.004 260);
+  --ring: oklch(0.7 0.006 260);
   --bleed: oklch(0.58 0.19 15);
   --bleed-foreground: oklch(0.99 0.008 20);
   --fertile: oklch(0.72 0.11 200);
@@ -72,7 +75,7 @@
   --chart-3: oklch(0.72 0.11 200);
   --chart-4: oklch(0.62 0.11 330);
   --chart-5: oklch(0.8 0.09 90);
-  --radius: 1.1rem;
+  --radius: 0.9rem;
 }
 
 /* Neutral, clean marketing theme — scoped to /site and /contact only.
