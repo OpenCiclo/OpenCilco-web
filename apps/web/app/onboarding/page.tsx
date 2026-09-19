@@ -47,7 +47,7 @@ export default function OnboardingPage() {
       setBusy(true);
       await storeBrowserPassword(PHRASE_USERNAME, wallet.mnemonic);
       await unlock(wallet.mnemonic, { create: true });
-      router.push("/");
+      router.push("/app");
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : t.errorGeneric;
       setError(message);
@@ -71,7 +71,7 @@ export default function OnboardingPage() {
       setError(null);
       await createEmailAccount(email, password);
       await storeBrowserPassword(email.trim().toLowerCase(), password);
-      router.push("/");
+      router.push("/app");
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : t.errorGeneric;
       setError(message);

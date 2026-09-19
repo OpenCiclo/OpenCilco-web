@@ -75,6 +75,32 @@
   --radius: 1.1rem;
 }
 
+/* Neutral, clean marketing theme — scoped to /site and /contact only.
+   The app keeps its warm rose identity; the public landing reads white,
+   modern and reliable, letting the colorful cycle ring be the one accent. */
+.marketing-theme {
+  color-scheme: light;
+  --background: oklch(0.985 0.002 260);
+  --foreground: oklch(0.24 0.006 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.006 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.006 260);
+  --primary: oklch(0.27 0.008 260);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.968 0.003 260);
+  --secondary-foreground: oklch(0.32 0.008 260);
+  --muted: oklch(0.968 0.003 260);
+  --muted-foreground: oklch(0.52 0.008 260);
+  --accent: oklch(0.962 0.003 260);
+  --accent-foreground: oklch(0.28 0.008 260);
+  --destructive: oklch(0.58 0.2 20);
+  --border: oklch(0.921 0.004 260);
+  --input: oklch(0.921 0.004 260);
+  --ring: oklch(0.7 0.006 260);
+  --radius: 0.9rem;
+}
+
 @layer base {
   * {
     border-color: var(--border);
