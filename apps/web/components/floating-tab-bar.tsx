@@ -15,23 +15,21 @@ export function FloatingTabBar() {
   const pathname = usePathname();
   if (
     !wallet ||
+    pathname === "/" ||
     pathname.startsWith("/dev-") ||
     pathname.startsWith("/help") ||
-    pathname.startsWith("/site") ||
     pathname.startsWith("/contact")
   )
     return null;
 
   const items = [
-    { href: "/", label: t.calendar, icon: CalendarDays },
+    { href: "/app", label: t.calendar, icon: CalendarDays },
     { href: "/patterns", label: t.patterns, icon: LineChart },
     { href: "/learn", label: t.learn, icon: BookOpen },
     { href: "/settings", label: t.settings, icon: Settings },
   ];
-  const activeIndex = items.findIndex((item) =>
-    item.href === "/"
-      ? pathname === "/"
-      : pathname === item.href || pathname.startsWith(`${item.href}/`),
+  const activeIndex = items.findIndex(
+    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
   );
   const bubbleIndex = Math.max(0, activeIndex);
 

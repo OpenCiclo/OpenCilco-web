@@ -4,8 +4,7 @@
 import type { Locale } from "@/lib/i18n";
 
 export const MARKETING_LINKS = {
-  app: "/",
-  site: "/site",
+  app: "/app",
   learn: "/learn",
   docs: "/help",
   privacy: "/privacy",

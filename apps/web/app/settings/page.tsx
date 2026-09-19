@@ -320,7 +320,7 @@ export default function SettingsPage() {
         )}
       </Card>
       <Card className="mt-4 flex flex-col gap-3 rounded-3xl">
-        <Button variant="outline" onClick={() => void signOut().then(() => router.push("/"))}>
+        <Button variant="outline" onClick={() => void signOut().then(() => router.push("/app"))}>
           {t.logout}
         </Button>
         <Button
@@ -328,7 +328,7 @@ export default function SettingsPage() {
           onClick={async () => {
             if (!window.confirm(t.deleteConfirm)) return;
             await wipe();
-            router.push("/");
+            router.push("/app");
           }}
         >
           {t.deleteAccount}

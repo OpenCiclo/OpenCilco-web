@@ -8,7 +8,7 @@ import { type ReactNode } from "react";
 
 import { useCiclo } from "@/lib/client/ciclo-context";
 import { otherLocale } from "@/lib/i18n";
-import { marketingCopy } from "@/lib/marketing/copy";
+import { marketingCopy, MARKETING_LINKS } from "@/lib/marketing/copy";
 import { Button } from "@/components/ui/button";
 
 function NavLink({
@@ -49,7 +49,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
     <div className="marketing-theme flex min-h-dvh flex-col bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
-          <Link href="/site" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span aria-hidden className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground">
               <span className="size-2.5 rounded-full bg-primary-foreground" />
             </span>
@@ -79,7 +79,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
               {copy.langToggle}
             </button>
             <Link
-              href="/"
+              href={MARKETING_LINKS.app}
               className="inline-flex min-h-9 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               {copy.openApp}
@@ -94,7 +94,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-10">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="max-w-sm">
-              <Link href="/site" className="font-serif text-lg">
+              <Link href="/" className="font-serif text-lg">
                 {copy.brand}
               </Link>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{copy.footer.disclaimer}</p>

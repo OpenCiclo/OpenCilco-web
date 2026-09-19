@@ -45,7 +45,7 @@ export default function UnlockPage() {
       setError(null);
       await unlockWithPassword(email, password);
       await storeBrowserPassword(email.trim().toLowerCase(), password);
-      router.push("/");
+      router.push("/app");
     } catch (cause) {
       if (cause instanceof InvalidCredentialsError) {
         setError(t.invalidCredentials);
@@ -64,7 +64,7 @@ export default function UnlockPage() {
       setError(null);
       await unlock(phrase);
       await storeBrowserPassword(PHRASE_USERNAME, phrase.trim().toLowerCase().replace(/\s+/g, " "));
-      router.push("/");
+      router.push("/app");
     } catch (cause) {
       setError(cause instanceof InvalidPhraseError ? t.invalidPhrase : t.errorGeneric);
     } finally {

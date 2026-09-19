@@ -57,7 +57,7 @@ export function ForecastCard() {
       <Card className="flex flex-col gap-4">
         <p>{t.noDates}</p>
         <Link
-          href="/"
+          href="/app"
           className="inline-flex min-h-11 items-center justify-center rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground"
         >
           {t.addStart}
