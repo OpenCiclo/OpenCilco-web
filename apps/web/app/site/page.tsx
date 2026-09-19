@@ -23,7 +23,7 @@ import { useCiclo } from "@/lib/client/ciclo-context";
 import { marketingCopy, MARKETING_LINKS } from "@/lib/marketing/copy";
 import { LEARN_ARTICLES, articleCopy } from "@/lib/learn/articles";
 import { Reveal } from "@/components/marketing/reveal";
-import { CyclePreview } from "@/components/marketing/cycle-preview";
+import { AppDemo } from "@/components/marketing/app-demo";
 import { GithubMark } from "@/components/marketing/github-mark";
 import { TypewriterTitle } from "@/components/marketing/typewriter-title";
 
@@ -106,7 +106,7 @@ export default function SitePage() {
           </div>
 
           <div className="w-full max-w-md justify-self-center lg:justify-self-end">
-            <CyclePreview copy={copy.preview} />
+            <AppDemo locale={locale} />
           </div>
         </div>
       </section>
