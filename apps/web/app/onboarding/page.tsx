@@ -7,6 +7,7 @@ import { type Wallet } from "@/lib/crypto/wallet";
 import { PHRASE_USERNAME, storeBrowserPassword } from "@/lib/client/credentials";
 import { useCiclo } from "@/lib/client/ciclo-context";
 import { AppShell } from "@/components/app-shell";
+import { PhraseQrCode } from "@/components/phrase-qr-code";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -221,6 +222,10 @@ export default function OnboardingPage() {
                     </li>
                   ))}
                 </ol>
+                <div className="flex flex-col items-center gap-2 py-1">
+                  <PhraseQrCode mnemonic={wallet.mnemonic} label={t.backupQrLabel} />
+                  <p className="text-center text-xs text-muted-foreground">{t.backupQrHint}</p>
+                </div>
                 <div className="flex gap-2">
                   <Button
                     type="button"

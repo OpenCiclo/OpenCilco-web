@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
 import { PHRASE_USERNAME, getBrowserPassword, storeBrowserPassword } from "@/lib/client/credentials";
@@ -11,6 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input, Textarea } from "@/components/ui/input";
+
+const PhraseQrScanner = dynamic(
+  () => import("@/components/phrase-qr-scanner").then((mod) => mod.PhraseQrScanner),
+  { ssr: false },
+);
 
 type Tab = "email" | "phrase";
 
@@ -23,6 +29,7 @@ export default function UnlockPage() {
   const [phrase, setPhrase] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
     void getBrowserPassword().then((cred) => {
@@ -57,19 +64,24 @@ export default function UnlockPage() {
     }
   }
 
-  async function submitPhrase(event: React.FormEvent) {
-    event.preventDefault();
+  async function unlockFromPhrase(nextPhrase: string) {
     try {
       setBusy(true);
       setError(null);
-      await unlock(phrase);
-      await storeBrowserPassword(PHRASE_USERNAME, phrase.trim().toLowerCase().replace(/\s+/g, " "));
+      const normalized = nextPhrase.trim().toLowerCase().replace(/\s+/g, " ");
+      await unlock(normalized);
+      await storeBrowserPassword(PHRASE_USERNAME, normalized);
       router.push("/app");
     } catch (cause) {
       setError(cause instanceof InvalidPhraseError ? t.invalidPhrase : t.errorGeneric);
     } finally {
       setBusy(false);
     }
+  }
+
+  async function submitPhrase(event: React.FormEvent) {
+    event.preventDefault();
+    await unlockFromPhrase(phrase);
   }
 
   return (
@@ -142,9 +154,31 @@ export default function UnlockPage() {
             <Button type="submit" disabled={busy}>
               {t.unlock}
             </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={() => {
+                setError(null);
+                setScanning(true);
+              }}
+            >
+              {t.scanBackupQr}
+            </Button>
           </form>
         </Card>
       )}
+      {scanning ? (
+        <PhraseQrScanner
+          t={t}
+          onCancel={() => setScanning(false)}
+          onPhrase={(mnemonic) => {
+            setPhrase(mnemonic);
+            setScanning(false);
+            void unlockFromPhrase(mnemonic);
+          }}
+        />
+      ) : null}
     </AppShell>
   );
 }

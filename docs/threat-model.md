@@ -51,6 +51,7 @@ Process memory on a shared computer is still in scope for the user (shoulder sur
 | Challenge replay | Stolen login | Short-lived nonces, one-use |
 | Ciphertext blob theft | Offline attack on AES-GCM | 256-bit key from HKDF of BIP39 seed; rate-limit kit fetch |
 | Shoulder surfing of mnemonic | Full account takeover | Show once; confirm; never re-display from the server |
+| Photo or screencap of backup QR | Full account takeover | Same reveal toggle as the phrase; payload is not a URL; decode stays in the browser |
 | Bundled consent | Forced research to get backup | Separate toggles; research is not a backup |
 | Lost mnemonic + password | Permanent data loss | Honest UX; export/import offered while the device is unlocked |
 | Utah mixed into prior | Silent cohort blending | `released_model.json` is mcPHASES-only; tests assert that |

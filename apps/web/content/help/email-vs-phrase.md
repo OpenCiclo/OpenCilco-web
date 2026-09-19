@@ -18,6 +18,12 @@ You hold the phrase. There is no mailbox row. We cannot show the phrase again if
 
 Save it in the browser’s password manager, or write it down somewhere you actually control. Anyone with the phrase can decrypt the diary on a new device.
 
+Settings (and the 12-word setup screen) can also show a QR of the **same** phrase. It is not a new secret. Anyone who photographs it can open the diary.
+
+Scan it inside Ciclo: Sign in → Super private mode → Scan QR. The camera never sends the phrase to the server. The payload is not a website URL, so a generic camera app will not open a link that contains your words.
+
+Email-and-password accounts can still sign in by typing those credentials. The QR is optional for them: it encodes the hidden 12-word phrase, not the email and password.
+
 ## What the server sees in both cases
 
 A public identifier derived from the secret (like an address), plus ciphertext. Login is a signature of a short-lived challenge. That proves you still hold the key without sending the key.
