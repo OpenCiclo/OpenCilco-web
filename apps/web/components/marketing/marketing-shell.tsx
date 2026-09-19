@@ -121,7 +121,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
 
         {/* Mobile navigation menu */}
         {menuOpen ? (
-          <div id="mobile-menu" className="border-t border-border/70 bg-background lg:hidden">
+          <div id="mobile-menu" className="animate-menu-down origin-top overflow-hidden border-t border-border/70 bg-background lg:hidden">
             <nav className="mx-auto flex w-full max-w-6xl flex-col px-5 py-2">
               {copy.nav.map((item) => (
                 <NavLink

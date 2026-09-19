@@ -164,6 +164,19 @@
   }
 }
 
+@keyframes menu-down {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
 @keyframes overlay-out {
   from {
     opacity: 1;
@@ -295,6 +308,11 @@
 
 .animate-sheet-down {
   animation: sheet-down 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-menu-down {
+  transform-origin: top;
+  animation: menu-down 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .animate-overlay-out {
@@ -565,6 +583,7 @@
   .animate-sheet-up,
   .animate-overlay-in,
   .animate-sheet-down,
+  .animate-menu-down,
   .animate-overlay-out,
   .animate-learn-card-in,
   .animate-learn-card-out,
