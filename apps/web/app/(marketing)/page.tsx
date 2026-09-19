@@ -60,7 +60,7 @@ export default function SitePage() {
               <ShieldCheck className="size-4 text-primary" />
               {copy.hero.eyebrow}
             </span>
-            <h1 className="flex min-h-[6.3rem] flex-col justify-end font-serif text-5xl leading-[1.05] tracking-tight text-balance sm:min-h-[7.875rem] sm:text-6xl">
+            <h1 className="flex min-h-[6.4rem] flex-col justify-end font-serif text-[1.9rem] leading-[1.12] tracking-tight text-balance sm:min-h-[7.875rem] sm:text-6xl sm:leading-[1.05]">
               <TypewriterTitle
                 lines={
                   locale === "es"
@@ -79,8 +79,9 @@ export default function SitePage() {
                 }
               />
             </h1>
-            <p className="max-w-xl text-lg leading-relaxed text-pretty text-muted-foreground">
-              {copy.hero.subtitle}
+            <p className="max-w-xl text-base leading-relaxed text-pretty text-muted-foreground sm:text-lg">
+              <span className="sm:hidden">{copy.hero.subtitleShort}</span>
+              <span className="hidden sm:inline">{copy.hero.subtitle}</span>
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Link
