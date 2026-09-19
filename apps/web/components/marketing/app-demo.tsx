@@ -150,6 +150,15 @@ export function AppDemo({ locale }: { locale: Locale }) {
   const weekStartsOn = locale === "es" ? 1 : 0;
   const cells = monthCells(year, month, weekStartsOn);
   const labels = weekdayLabels(locale, weekStartsOn);
+  const monthTitle = formatIsoUtc(`${year}-${String(month).padStart(2, "0")}-01`, locale, {
+    month: "long",
+    year: "numeric",
+  });
+  const greetingDate = formatIsoUtc(today, locale, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 
   const possibleStarts = useMemo(
     () =>
@@ -224,23 +233,9 @@ export function AppDemo({ locale }: { locale: Locale }) {
           <span className="font-serif text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
             {t.appName}
           </span>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setShowMoon((value) => !value)}
-              aria-label={t.lunarPhases}
-              aria-pressed={showMoon}
-              className={cn(
-                "flex size-6 items-center justify-center rounded-full transition-colors",
-                showMoon ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
-              )}
-            >
-              <Moon className="size-3.5" aria-hidden />
-            </button>
-            <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] font-semibold text-muted-foreground">
-              Demo
-            </span>
-          </div>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] font-semibold text-muted-foreground">
+            Demo
+          </span>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-2">
@@ -254,7 +249,10 @@ export function AppDemo({ locale }: { locale: Locale }) {
               phase={phase}
               labels={labels}
               cells={cells}
+              monthTitle={monthTitle}
+              greetingDate={greetingDate}
               showMoon={showMoon}
+              onToggleMoon={() => setShowMoon((value) => !value)}
               selected={selected}
               selectedInfo={selectedInfo}
               possibleStarts={possibleStarts}
@@ -425,7 +423,10 @@ function CalendarTab({
   phase,
   labels,
   cells,
+  monthTitle,
+  greetingDate,
   showMoon,
+  onToggleMoon,
   selected,
   selectedInfo,
   possibleStarts,
@@ -440,7 +441,10 @@ function CalendarTab({
   phase: ReturnType<typeof cycleOverview>["currentPhase"];
   labels: string[];
   cells: (string | null)[];
+  monthTitle: string;
+  greetingDate: string;
   showMoon: boolean;
+  onToggleMoon: () => void;
   selected: string | null;
   selectedInfo: string | null;
   possibleStarts: Set<string>;
@@ -449,6 +453,8 @@ function CalendarTab({
 }) {
   return (
     <div className="flex flex-col gap-3">
+      <p className="text-[11px] font-medium capitalize text-muted-foreground">{greetingDate}</p>
+
       {phase ? (
         <div className="relative overflow-hidden rounded-2xl bg-primary p-3.5 text-primary-foreground">
           <div aria-hidden className="absolute -right-6 -top-8 size-24 rounded-full bg-primary-foreground/10" />
@@ -470,6 +476,21 @@ function CalendarTab({
       ) : null}
 
       <div>
+        <div className="mb-2 flex items-center justify-between px-0.5">
+          <h2 className="font-serif text-sm capitalize text-card-foreground">{monthTitle}</h2>
+          <button
+            type="button"
+            onClick={onToggleMoon}
+            aria-label={showMoon ? t.hideLunarPhases : t.toggleLunarPhases}
+            aria-pressed={showMoon}
+            className={cn(
+              "flex size-6 shrink-0 items-center justify-center rounded-full transition-colors active:scale-90",
+              showMoon ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
+            )}
+          >
+            <Moon className="size-3.5" aria-hidden />
+          </button>
+        </div>
         <div className="mb-1 grid grid-cols-7">
           {labels.map((label, index) => (
             <div
@@ -499,7 +520,10 @@ function CalendarTab({
             const moonInfo = showMoon ? lunarDayInfo(iso) : null;
 
             return (
-              <div key={iso} className="flex flex-col items-center">
+              <div
+                key={iso}
+                className={cn("flex flex-col items-center", showMoon ? "min-h-[3.25rem]" : "min-h-[2.5rem]")}
+              >
                 <span
                   className={cn(
                     "flex items-center justify-center overflow-hidden transition-all",
@@ -515,7 +539,7 @@ function CalendarTab({
                   aria-label={dayLabel}
                   aria-pressed={selected === iso}
                   className={cn(
-                    "relative mx-auto flex size-7 items-center justify-center rounded-full text-[10px] font-medium transition-transform active:scale-90",
+                    "flex size-7 items-center justify-center rounded-full text-[10px] font-medium transition-transform active:scale-90",
                     bleeding
                       ? "bg-bleed text-bleed-foreground"
                       : likelyStart
@@ -532,20 +556,13 @@ function CalendarTab({
                   )}
                 >
                   {Number(iso.slice(8, 10))}
-                  <span className="absolute -bottom-0.5 flex gap-0.5">
-                    {symptoms ? (
-                      <span
-                        className={cn(
-                          "size-1 rounded-full",
-                          bleeding ? "bg-bleed-foreground/80" : "bg-secondary-foreground/60",
-                        )}
-                      />
-                    ) : null}
-                    {note ? (
-                      <span className={cn("size-1 rounded-full", bleeding ? "bg-bleed-foreground" : "bg-primary/80")} />
-                    ) : null}
-                  </span>
                 </button>
+                <span className="mt-0.5 flex h-1 items-center gap-0.5">
+                  {symptoms ? (
+                    <span className="size-1 rounded-full bg-secondary-foreground/60" />
+                  ) : null}
+                  {note ? <span className="size-1 rounded-full bg-primary/80" /> : null}
+                </span>
               </div>
             );
           })}
