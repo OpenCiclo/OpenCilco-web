@@ -4,23 +4,25 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { ArrowUpRight, X } from "lucide-react";
 
 import { useCiclo } from "@/lib/client/ciclo-context";
 import { otherLocale } from "@/lib/i18n";
 import { marketingCopy, MARKETING_LINKS } from "@/lib/marketing/copy";
-import { Button } from "@/components/ui/button";
 
 function NavLink({
   href,
   external,
   children,
   className,
+  onClick,
 }: {
   href: string;
   external?: boolean;
   children: ReactNode;
   className?: string;
+  onClick?: () => void;
 }) {
   if (external || href.startsWith("#")) {
     return (
@@ -29,30 +31,58 @@ function NavLink({
         target={external ? "_blank" : undefined}
         rel={external ? "noreferrer" : undefined}
         className={className}
+        onClick={onClick}
       >
         {children}
       </a>
     );
   }
   return (
-    <Link href={href} className={className}>
+    <Link href={href} className={className} onClick={onClick}>
       {children}
     </Link>
+  );
+}
+
+function BrandMark() {
+  return (
+    <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+      <span className="size-2.5 rounded-full bg-primary-foreground" />
+    </span>
   );
 }
 
 export function MarketingShell({ children }: { children: ReactNode }) {
   const { locale, setLocale } = useCiclo();
   const copy = marketingCopy(locale);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="marketing-theme flex min-h-dvh flex-col bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
-          <Link href="/" className="flex items-center gap-2">
-            <span aria-hidden className="grid size-8 place-items-center rounded-full bg-primary text-primary-foreground">
-              <span className="size-2.5 rounded-full bg-primary-foreground" />
-            </span>
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-5 py-3.5">
+          {/* Mobile: circle toggles the menu. Desktop: logo links home. */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            className="flex items-center gap-2 lg:hidden"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            aria-label={
+              menuOpen
+                ? locale === "es"
+                  ? "Cerrar menú"
+                  : "Close menu"
+                : locale === "es"
+                  ? "Abrir menú"
+                  : "Open menu"
+            }
+          >
+            <BrandMark />
+            <span className="font-serif text-xl tracking-tight">{copy.brand}</span>
+          </button>
+          <Link href="/" className="hidden items-center gap-2 lg:flex">
+            <BrandMark />
             <span className="font-serif text-xl tracking-tight">{copy.brand}</span>
           </Link>
 
@@ -80,12 +110,34 @@ export function MarketingShell({ children }: { children: ReactNode }) {
             </button>
             <Link
               href={MARKETING_LINKS.app}
-              className="inline-flex min-h-9 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              className="inline-flex min-h-9 items-center justify-center gap-1 rounded-xl bg-primary px-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:px-4"
             >
-              {copy.openApp}
+              <span className="lg:hidden">App</span>
+              <span className="hidden lg:inline">{copy.openApp}</span>
+              <ArrowUpRight className="size-4 lg:hidden" />
             </Link>
           </div>
         </div>
+
+        {/* Mobile navigation menu */}
+        {menuOpen ? (
+          <div id="mobile-menu" className="animate-menu-down origin-top overflow-hidden border-t border-border/70 bg-background lg:hidden">
+            <nav className="mx-auto flex w-full max-w-6xl flex-col px-5 py-2">
+              {copy.nav.map((item) => (
+                <NavLink
+                  key={item.label}
+                  href={item.href}
+                  external={item.external}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center justify-between border-b border-border/50 py-3 text-base font-semibold text-foreground last:border-b-0"
+                >
+                  {item.label}
+                  {item.external ? <ArrowUpRight className="size-4 text-muted-foreground" /> : null}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+        ) : null}
       </header>
 
       <main className="flex-1">{children}</main>

@@ -28,6 +28,7 @@ export type MarketingCopy = {
     eyebrow: string;
     title: string;
     subtitle: string;
+    subtitleShort: string;
     disclaimer: string;
     ctaPrimary: string;
     ctaSecondary: string;
@@ -107,6 +108,7 @@ const es: MarketingCopy = {
     title: "Tu ciclo, en tu dispositivo.",
     subtitle:
       "OpenCiclo sigue y pronostica tu ciclo menstrual mientras cifra tu diario en tu propio navegador. Sin anuncios, sin rastreo, sin vender tus datos.",
+    subtitleShort: "Sigue y pronostica tu ciclo con el diario cifrado en tu navegador. Sin anuncios ni rastreo.",
     disclaimer: "No es un dispositivo médico ni un método anticonceptivo.",
     ctaPrimary: "Abrir la app",
     ctaSecondary: "Ver en GitHub",
@@ -294,6 +296,7 @@ const en: MarketingCopy = {
     title: "Your cycle, on your device.",
     subtitle:
       "OpenCiclo tracks and forecasts your menstrual cycle while encrypting your diary right in your browser. No ads, no tracking, no selling your data.",
+    subtitleShort: "Track and forecast your cycle with your diary encrypted in your browser. No ads, no tracking.",
     disclaimer: "Not a medical device or a contraceptive method.",
     ctaPrimary: "Open the app",
     ctaSecondary: "View on GitHub",

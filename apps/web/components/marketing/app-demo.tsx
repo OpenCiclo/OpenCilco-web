@@ -220,7 +220,7 @@ export function AppDemo({ locale }: { locale: Locale }) {
 
   return (
     <div
-      className="relative mx-auto flex w-[300px] flex-col rounded-[2.5rem] border-2 border-foreground/90 bg-foreground/90 p-1.5 shadow-2xl"
+      className="relative mx-auto flex w-full max-w-[300px] flex-col rounded-[2.5rem] border-2 border-foreground/90 bg-foreground/90 p-1.5 shadow-2xl"
       role="group"
       aria-label={locale === "es" ? "Demo interactiva de la app" : "Interactive app demo"}
     >

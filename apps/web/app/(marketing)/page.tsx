@@ -56,11 +56,11 @@ export default function SitePage() {
         />
         <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-5 pt-14 pb-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:pt-20 lg:pb-24">
           <div className="animate-fade-up flex flex-col items-start gap-6">
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+            <span className="hidden items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground sm:inline-flex">
               <ShieldCheck className="size-4 text-primary" />
               {copy.hero.eyebrow}
             </span>
-            <h1 className="flex min-h-[6.3rem] flex-col justify-end font-serif text-5xl leading-[1.05] tracking-tight text-balance sm:min-h-[7.875rem] sm:text-6xl">
+            <h1 className="flex min-h-[6.4rem] flex-col justify-end font-serif text-[1.9rem] leading-[1.12] tracking-tight text-balance sm:min-h-[7.875rem] sm:text-6xl sm:leading-[1.05]">
               <TypewriterTitle
                 lines={
                   locale === "es"
@@ -79,8 +79,9 @@ export default function SitePage() {
                 }
               />
             </h1>
-            <p className="max-w-xl text-lg leading-relaxed text-pretty text-muted-foreground">
-              {copy.hero.subtitle}
+            <p className="max-w-xl text-base leading-relaxed text-pretty text-muted-foreground sm:text-lg">
+              <span className="sm:hidden">{copy.hero.subtitleShort}</span>
+              <span className="hidden sm:inline">{copy.hero.subtitle}</span>
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Link
@@ -100,7 +101,7 @@ export default function SitePage() {
                 {copy.hero.ctaSecondary}
               </a>
             </div>
-            <p className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
+            <p className="inline-flex items-center justify-center gap-2 rounded-full bg-muted px-3 py-1.5 text-center text-xs font-medium text-muted-foreground">
               {copy.hero.disclaimer}
             </p>
           </div>
@@ -293,8 +294,10 @@ export default function SitePage() {
             href={MARKETING_LINKS.app}
             className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-primary px-8 text-base font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
           >
-            {copy.finalCta.button}
-            <ArrowRight className="size-4" />
+            <span className="sm:hidden">App</span>
+            <span className="hidden sm:inline">{copy.finalCta.button}</span>
+            <ArrowUpRight className="size-4 sm:hidden" />
+            <ArrowRight className="hidden size-4 sm:inline" />
           </Link>
         </Reveal>
       </section>
