@@ -25,6 +25,7 @@ import { LEARN_ARTICLES, articleCopy } from "@/lib/learn/articles";
 import { Reveal } from "@/components/marketing/reveal";
 import { CyclePreview } from "@/components/marketing/cycle-preview";
 import { GithubMark } from "@/components/marketing/github-mark";
+import { TypewriterTitle } from "@/components/marketing/typewriter-title";
 
 type IconComponent = (props: { className?: string }) => React.ReactNode;
 
@@ -60,7 +61,23 @@ export default function SitePage() {
               {copy.hero.eyebrow}
             </span>
             <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-balance sm:text-6xl">
-              {copy.hero.title}
+              <TypewriterTitle
+                lines={
+                  locale === "es"
+                    ? [
+                        "Tu ciclo, en tu dispositivo.",
+                        "Tu ciclo, privado.",
+                        "Tu ciclo, bajo tu control.",
+                        "Tu ciclo, tuyo.",
+                      ]
+                    : [
+                        "Your cycle, on your device.",
+                        "Your cycle, private.",
+                        "Your cycle, under your control.",
+                        "Your cycle, yours.",
+                      ]
+                }
+              />
             </h1>
             <p className="max-w-xl text-lg leading-relaxed text-pretty text-muted-foreground">
               {copy.hero.subtitle}
