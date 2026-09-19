@@ -13,7 +13,14 @@ import { cn } from "@/lib/utils";
 export function FloatingTabBar() {
   const { t, wallet } = useCiclo();
   const pathname = usePathname();
-  if (!wallet || pathname.startsWith("/dev-") || pathname.startsWith("/help")) return null;
+  if (
+    !wallet ||
+    pathname.startsWith("/dev-") ||
+    pathname.startsWith("/help") ||
+    pathname.startsWith("/site") ||
+    pathname.startsWith("/contact")
+  )
+    return null;
 
   const items = [
     { href: "/", label: t.calendar, icon: CalendarDays },
