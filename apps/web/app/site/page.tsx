@@ -60,7 +60,7 @@ export default function SitePage() {
               <ShieldCheck className="size-4 text-primary" />
               {copy.hero.eyebrow}
             </span>
-            <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-balance sm:text-6xl">
+            <h1 className="flex min-h-[6.3rem] flex-col justify-end font-serif text-5xl leading-[1.05] tracking-tight text-balance sm:min-h-[7.875rem] sm:text-6xl">
               <TypewriterTitle
                 lines={
                   locale === "es"
