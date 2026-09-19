@@ -1,0 +1,20 @@
+# Copyright © 2026 Emma Flora Harbison & Luis Rey Sánchez
+# SPDX-License-Identifier: Apache-2.0
+#
+# Example V0 benchmark configuration. This is not a production model card.
+
+name: v0_synthetic_baselines
+data: synthetic
+seed: 2026
+n_per_subgroup: 20
+test_fraction: 0.3
+models:
+  - last_cycle
+  - mean
+  - median
+  - rolling_mean
+  - rolling_median
+  - recency_weighted_mean
+  - recency_weighted_median
+  - population_prior
+recency_lambdas: [0.70, 0.80, 0.90, 0.95, 1.00]

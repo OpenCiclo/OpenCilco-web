@@ -1,0 +1,10 @@
+{
+  "name": "Ciclo",
+  "short_name": "Ciclo",
+  "description": "Privacy-first cycle forecasts. Not a medical device or contraceptive method.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4efe6",
+  "theme_color": "#f4efe6",
+  "lang": "es"
+}

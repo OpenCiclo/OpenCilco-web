@@ -1,0 +1,123 @@
+# agents.txt — OpenCiclo / Ciclo
+
+Machine-oriented map of this repository. Humans should start at README.md, /help, and CONTRIBUTING.md.
+Do not treat this file as user-facing copy. Do not paste it into the UI.
+
+Live copy on a hosted app: GET /agents.txt (apps/web/public/agents.txt).
+Cursor: also see the short AGENTS.md at the repo root. Do not edit apps/web/AGENTS.md; Next.js regenerates it.
+
+## Product split
+
+- OpenCiclo: Python forecasting library at repo root (`openciclo/`). Local-first. No accounts, sockets, or telemetry in the package.
+- Ciclo: optional Next.js web app in `apps/web/`. Encrypted diary + TypeScript port of the released forecast path.
+- Names: Python import is `openciclo`, never `oddy`. Some crypto labels and legacy cookies still say `oddy-*` / `oddy_session` — do not rename those without a migration.
+- Public name in the UI: Ciclo. Repo/docs: OpenCiclo.
+
+## Non-negotiables
+
+- Not a medical device. Forecasts can be wrong. Not contraception, not a fertility/ovulation test, not pregnancy detection.
+- User-facing copy that discusses cycles must keep that disclaimer (see `apps/web/lib/i18n.ts` `disclaimer`).
+- No Clerk, Auth0, analytics SDKs, ad pixels, or exception trackers that could receive health fields.
+- No neural nets / transformers / deep learning.
+- Do not log period dates, mnemonics, passwords, AES keys, or plaintext diary.
+- Do not add `user_id` / `account_id` / `pubkey_hash` to `research_contributions`. A join table account→pool_id is a de-anonymization bug.
+- Do not mix Utah/Creighton into `openciclo/artifacts/released_model.json`. mcPHASES aggregate prior only.
+- Do not commit restricted CSVs (mcPHASES, Creighton, etc.). Gitignored under `training/dataset-do-not-commit/`.
+- Do not invent metrics. Do not choose `model_id` from synthetic CI scores.
+- English for code, comments, and documentation. UI strings: Spanish + English in `i18n.ts`. Help pages: English only.
+- Documentation voice for humans: short sentences, define jargon once, no marketing filler. This file is exempt.
+
+## Docs surfaces (do not mix)
+
+- `/learn` — health education (biology, symptoms, mucus, when to seek care). Bilingual. Source: `apps/web/lib/learn/articles.ts`. Do not dump hosting/crypto here.
+- `/help` — product/operator docs (hosting, encryption, UI labels, forecast behaviour). English. Source: `apps/web/content/help/*.md` + catalog `apps/web/lib/help/articles.ts`. Public, no wallet.
+- `/privacy` — short user privacy page (ES/EN). Long form: `PRIVACY.md`. Contributor checklist: `docs/privacy.md`.
+- GitHub engineering: README.md, ARCHITECTURE.md, CONTRIBUTING.md, MODEL_CARD.md, DATASETS.md, `docs/modeling.md`, `docs/evaluation.md`, `docs/api.md`, `docs/threat-model.md`.
+- `docs/kb/` — index only. Canonical Help markdown is `apps/web/content/help/` so Vercel (root `apps/web`) actually ships it.
+- Help renderer: `apps/web/lib/help/markdown.tsx` (headings, lists, tables, fenced code, `**bold**`, `` `code` ``, `[text](url)`). No raw HTML. Safe hrefs: `/`, `http(s)`, `#`.
+
+## Hosting
+
+- Intended production: Vercel project root directory `apps/web` + Neon Postgres.
+- Env: `DATABASE_URL`, `SESSION_SECRET`, `EMAIL_LOOKUP_SECRET`, `APP_URL` (no trailing slash). Optional `RESEND_API_KEY` / SMTP. Email sign-in does not require inbox magic links.
+- SQL: `apps/web/drizzle/0000_init.sql` and `0001_pool_upsert.sql`. No plaintext health columns.
+- Local UI: `cd apps/web && npm run dev` with `.env.local` from `.env.template`. You cannot see or edit `.env`.
+- Local stack: `docker compose up --build` from repo root. `APP_URL` is `http://localhost:3000`. Bind is `127.0.0.1:3000`.
+- Do not document or reintroduce Tailscale / serve tunnels. Public access is Vercel.
+- Docker image copies `content/` into the runner so `/help` can `readFileSync` markdown (also `outputFileTracingIncludes` in `next.config.ts`).
+- `/dev-seasons` is a playground; `notFound()` in production. Hide tab bar on `/dev-*` and `/help`.
+- Next CSP: relax `unsafe-eval` + `ws:` only when `NODE_ENV !== production`.
+
+## Python library map
+
+```
+openciclo.schemas          Pydantic models
+openciclo.data             cycle math, validation, synthetic, mcPHASES/Creighton loaders
+openciclo.features         recency weights, length summaries
+openciclo.models           baselines, shrinkage, population prior
+openciclo.artifacts        released_model.json (mcPHASES aggregate; no microdata)
+openciclo.forecasting      public predict()
+openciclo.explanations     drivers (contributed to prediction, not causation)
+openciclo.evaluation       walk-forward; CI synthetic; mcphases --fit-release
+openciclo.calibration      reliability summaries
+```
+
+Public API: `from openciclo import predict`. Docs: `docs/api.md`.
+Parity vectors: `python scripts/generate_forecast_parity.py` → `tests/fixtures/forecast_parity.json`.
+Tests: `pytest`, `ruff`, `mypy openciclo`.
+
+Walk-forward: only starts before s_k may forecast s_k. Never shuffle a person’s cycles into random train/test.
+
+Shrinkage (released default): mix personal median with population prior; k from the release artifact (web port uses k=2, discrete Laplace 1–90). Cold start (0–1 starts) → prior, high uncertainty.
+
+V1 predicts next period start and cycle length only. Optional observations are ignored by V0 predictors.
+
+## Web app map
+
+```
+apps/web/app/                    App Router. Tabs: / calendar, /patterns, /learn, /settings
+apps/web/app/help/               Help index + [slug]
+apps/web/app/api/                auth challenge/verify, vault, recovery fetch, research pool
+apps/web/components/calendar/    status card, season overlay, day sheet
+apps/web/lib/forecast/           TS port of shrinkage + Laplace; must match Python fixtures
+apps/web/lib/cycle/phases.ts     observed vs estimated phase heuristic (NOT the forecast engine)
+apps/web/lib/cycle/season-guide.ts  inner-season copy EN/ES
+apps/web/lib/client/ciclo-context.tsx  wallet + diary in memory
+apps/web/lib/crypto/wallet.ts    BIP39, HKDF, Ed25519, AES-GCM
+apps/web/lib/learn/articles.ts   Learn wiki
+apps/web/lib/i18n.ts             all UI chrome + Learn is separate; Help is markdown
+apps/web/content/help/           Help markdown (canonical)
+```
+
+Diary schema currently v6: period starts, daily flow/mucus/symptoms/notes, forecastingEnabled. Migrations in parseDiary. New fields go in the encrypted blob, not new Postgres health columns.
+
+Phase heuristic (`phaseAtDate` / `cycleOverview`): flow today → menstrual observed; else calendar windows from last start + expected bleed length + ovulation window 16–10 days before next start. Independent of `predict()`. If forecastingEnabled is false, do not show estimated follicular/ovulation/luteal.
+
+Inner seasons: winter=menstrual, spring=follicular, summer=ovulation, fall=luteal. Overlay: `season-guide-overlay.tsx`. Setting: visualSeasons.
+
+Intermenstrual bleeding is a symptom, never a period start.
+
+## Crypto / identity (do not “simplify”)
+
+- Device generates BIP39 12-word mnemonic.
+- HKDF-SHA-256 info labels are `oddy-aes-v1` and `oddy-sign-v1` in `wallet.ts`. Changing them breaks existing vaults.
+- AES-256-GCM for diary. Ed25519 for login challenge signatures.
+- Email path: password wraps mnemonic (PBKDF2-SHA-256 + AES-GCM). Server stores HMAC(email) + wrapped kit. `POST /api/recovery/fetch` returns ciphertext only. Server must never unwrap.
+- No host-side password reset. Lost password + lost phrase ⇒ lost hosted diary. Export/import restores data, not the old key.
+- Session cookie; legacy name `oddy_session` still recognized.
+- localStorage keys migrated `oddy.*` → `ciclo.*` in `storage-migrate.ts`. Keep that one-way migrate.
+
+## Research pool
+
+POST integer cycle lengths, no pubkey. Server assigns opaque pool_id. Device remembers “already contributed”. Training on this pool is out of scope until explicitly designed. UI must warn that uploaded rows cannot be deleted by account.
+
+## What not to build here
+
+- Native mobile apps, federated learning, custom cryptography, confirmed ovulation claims.
+- Using Help as a second Learn tab, or Learn as hosting docs.
+- Tailscale, ngrok, or other tunnels as the documented access path.
+- Deep learning “improvements” to the forecast.
+
+## When behaviour changes
+
+Update the matching Help article and engineering doc in the same change. If you add a Help slug, add it to `HELP_ARTICLES` and a `content/help/<slug>.md` whose first line is `# <title>` matching the catalog. Run `cd apps/web && npm test`. Forecast changes also need Python tests + parity fixtures + CONTRIBUTING benchmark rules.

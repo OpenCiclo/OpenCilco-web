@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: openciclo
+      POSTGRES_PASSWORD: openciclo
+      POSTGRES_DB: openciclo
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./apps/web/drizzle/0000_init.sql:/docker-entrypoint-initdb.d/0000_init.sql
+      - ./apps/web/drizzle/0001_pool_upsert.sql:/docker-entrypoint-initdb.d/0001_pool_upsert.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openciclo -d openciclo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+  web:
+    build:
+      context: ./apps/web
+    image: openciclo-web
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      HOSTNAME: 0.0.0.0
+      DATABASE_URL: postgres://openciclo:openciclo@db:5432/openciclo
+      SESSION_SECRET: local-dev-session-secret-change-me
+      EMAIL_LOOKUP_SECRET: local-dev-email-hmac-secret-change-me
+      APP_URL: http://localhost:3000
+      MAIL_FROM: Ciclo <noreply@localhost>
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+volumes:
+  pgdata:
