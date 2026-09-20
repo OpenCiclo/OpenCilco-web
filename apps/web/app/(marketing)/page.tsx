@@ -60,22 +60,14 @@ export default function SitePage() {
               <ShieldCheck className="size-4 text-primary" />
               {copy.hero.eyebrow}
             </span>
-            <h1 className="flex min-h-[6.4rem] flex-col justify-end font-serif text-[1.9rem] leading-[1.12] tracking-tight text-balance sm:min-h-[7.875rem] sm:text-6xl sm:leading-[1.05]">
+            <h1 className="flex min-h-[5.9rem] w-full flex-col font-serif text-[2.4rem] leading-[1.12] tracking-tight sm:min-h-[8.4rem] sm:text-6xl sm:leading-[1.05]">
+              <span className="block">{locale === "es" ? "Tu ciclo," : "Your cycle,"}</span>
               <TypewriterTitle
+                prefix={locale === "es" ? "Tu ciclo," : "Your cycle,"}
                 lines={
                   locale === "es"
-                    ? [
-                        "Tu ciclo, en tu dispositivo.",
-                        "Tu ciclo, privado.",
-                        "Tu ciclo, bajo tu control.",
-                        "Tu ciclo, tuyo.",
-                      ]
-                    : [
-                        "Your cycle, on your device.",
-                        "Your cycle, private.",
-                        "Your cycle, under your control.",
-                        "Your cycle, yours.",
-                      ]
+                    ? ["en tu dispositivo.", "privado.", "bajo tu control.", "tuyo."]
+                    : ["on your device.", "private.", "under your control.", "yours."]
                 }
               />
             </h1>

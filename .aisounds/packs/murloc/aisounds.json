@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "pack": {
+    "id": "32a43c3f-d350-4e45-8d1b-b76b09072b63",
+    "slug": "murloc",
+    "name": "murloc",
+    "description": "The good old Murloc :)",
+    "author": "luisreysan",
+    "author_url": "https://github.com/luisreysan",
+    "license": "CC0",
+    "tags": [
+      "funny"
+    ],
+    "created_at": "2026-05-07T14:07:03.480Z",
+    "aise_version": "1.0"
+  },
+  "sounds": {
+    "task_complete": {
+      "file": "sounds/task_complete.mp3",
+      "duration_ms": 1740,
+      "loop": false,
+      "size_bytes": 45230
+    }
+  },
+  "tool_configs": {
+    "cursor": {
+      "config_path": "~/.cursor/hooks.json",
+      "hook_format": "aisounds-v1"
+    },
+    "claude-code": {
+      "config_path": "~/.claude/settings.json",
+      "hook_format": "aisounds-v1"
+    }
+  }
+}

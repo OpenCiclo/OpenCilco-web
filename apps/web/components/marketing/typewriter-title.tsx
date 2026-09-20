@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 
 type TypewriterTitleProps = {
   lines: string[];
+  prefix?: string;
 };
 
-export function TypewriterTitle({ lines }: TypewriterTitleProps) {
+export function TypewriterTitle({ lines, prefix }: TypewriterTitleProps) {
   const [lineIndex, setLineIndex] = useState(0);
   const [text, setText] = useState(lines[0] ?? "");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -52,12 +53,11 @@ export function TypewriterTitle({ lines }: TypewriterTitleProps) {
     return () => window.clearTimeout(timer);
   }, [isDeleting, lineIndex, lines, reducedMotion, text]);
 
+  const currentLine = lines[lineIndex] ?? lines[0] ?? "";
+  const accessible = prefix ? `${prefix} ${currentLine}` : currentLine;
+
   return (
-    <span
-      aria-live="polite"
-      aria-label={lines[lineIndex] ?? lines[0]}
-      className="inline-block min-h-[1.05em]"
-    >
+    <span aria-live="polite" aria-label={accessible} className="block min-h-[1.15em]">
       {text}
       <span aria-hidden className="ml-1 inline-block h-[0.85em] w-px translate-y-1 animate-pulse bg-current" />
     </span>

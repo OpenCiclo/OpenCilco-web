@@ -10,6 +10,7 @@ import { ArrowUpRight, X } from "lucide-react";
 import { useCiclo } from "@/lib/client/ciclo-context";
 import { otherLocale } from "@/lib/i18n";
 import { marketingCopy, MARKETING_LINKS } from "@/lib/marketing/copy";
+import { BrandMark } from "@/components/brand-mark";
 
 function NavLink({
   href,
@@ -41,14 +42,6 @@ function NavLink({
     <Link href={href} className={className} onClick={onClick}>
       {children}
     </Link>
-  );
-}
-
-function BrandMark() {
-  return (
-    <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
-      <span className="size-2.5 rounded-full bg-primary-foreground" />
-    </span>
   );
 }
 

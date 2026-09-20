@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "activePack": "murloc",
+  "packs": [
+    {
+      "slug": "murloc",
+      "version": "1.0",
+      "name": "murloc",
+      "tools": [
+        "cursor"
+      ],
+      "scope": "project",
+      "installedAt": "2026-09-20T07:11:56.943Z",
+      "updatedAt": "2026-09-20T07:11:56.944Z",
+      "packDir": "C:\\Users\\luisr\\Documents\\oddy\\.aisounds\\packs\\murloc"
+    }
+  ]
+}
