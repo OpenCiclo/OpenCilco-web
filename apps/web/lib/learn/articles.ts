@@ -3,7 +3,13 @@
 
 import type { Locale } from "@/lib/i18n";
 
-export type LearnCategory = "cycle" | "symptoms" | "mucus" | "care";
+export const LEARN_CATEGORIES = ["cycle", "symptoms", "mucus", "care"] as const;
+
+export type LearnCategory = (typeof LEARN_CATEGORIES)[number];
+
+export function isLearnCategory(value: string): value is LearnCategory {
+  return (LEARN_CATEGORIES as readonly string[]).includes(value);
+}
 
 export type LearnSource = {
   label: string;

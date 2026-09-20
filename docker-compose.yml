@@ -11,6 +11,7 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./apps/web/drizzle/0000_init.sql:/docker-entrypoint-initdb.d/0000_init.sql
       - ./apps/web/drizzle/0001_pool_upsert.sql:/docker-entrypoint-initdb.d/0001_pool_upsert.sql
+      - ./apps/web/drizzle/0002_learn_articles.sql:/docker-entrypoint-initdb.d/0002_learn_articles.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U openciclo -d openciclo"]
       interval: 5s

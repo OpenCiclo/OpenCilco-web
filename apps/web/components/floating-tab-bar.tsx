@@ -18,7 +18,8 @@ export function FloatingTabBar() {
     pathname === "/" ||
     pathname.startsWith("/dev-") ||
     pathname.startsWith("/help") ||
-    pathname.startsWith("/contact")
+    pathname.startsWith("/contact") ||
+    pathname.startsWith("/console")
   )
     return null;
 

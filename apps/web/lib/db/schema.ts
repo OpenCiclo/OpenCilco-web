@@ -57,6 +57,19 @@ export const recoveryAttempts = pgTable("recovery_attempts", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const learnArticles = pgTable("learn_articles", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: text("slug").notNull().unique(),
+  category: text("category").notNull(),
+  reviewedAt: text("reviewed_at").notNull(),
+  status: text("status").notNull(),
+  sources: jsonb("sources").notNull(),
+  copyEs: jsonb("copy_es").notNull(),
+  copyEn: jsonb("copy_en").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const recoveryTokens = pgTable("recovery_tokens", {
   id: uuid("id").defaultRandom().primaryKey(),
   emailLookup: text("email_lookup").notNull(),

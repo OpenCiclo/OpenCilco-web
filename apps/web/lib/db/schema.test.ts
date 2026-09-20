@@ -30,4 +30,16 @@ describe("database schema", () => {
     expect(upsert).toContain("contributor_key_hash");
     expect(upsert.toLowerCase()).not.toContain("account_id");
   });
+
+  it("stores learn articles without account or health columns", () => {
+    const learn = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), "../../drizzle/0002_learn_articles.sql"),
+      "utf8",
+    );
+    expect(learn).toContain("CREATE TABLE IF NOT EXISTS learn_articles");
+    expect(learn.toLowerCase()).not.toContain("account_id");
+    expect(learn.toLowerCase()).not.toContain("pubkey");
+    expect(learn.toLowerCase()).not.toContain("ciphertext");
+    expect(learn.toLowerCase()).not.toContain("cycle_lengths");
+  });
 });
