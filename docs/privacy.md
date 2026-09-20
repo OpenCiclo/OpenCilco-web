@@ -43,7 +43,7 @@ If a design would let the host restore the mnemonic from email alone, reject the
 
 ## Key loss
 
-Lost mnemonic and lost wrap password ⇒ lost hosted diary. Document this in the UI before the user creates an account. There is no shadow email reset. Export/import restores **diary data** into a new account; it does not restore the old keys.
+Lost mnemonic and lost wrap password ⇒ lost hosted diary. Document this in the UI before the user creates an account. There is no shadow email reset. Changing the wrap password in Settings while unlocked is allowed (re-wrap only). Export/import restores **diary data** into a new account; it does not restore the old keys.
 
 ## Threats
 

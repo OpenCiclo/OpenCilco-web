@@ -4,13 +4,14 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { type Wallet } from "@/lib/crypto/wallet";
-import { PHRASE_USERNAME, storeBrowserPassword } from "@/lib/client/credentials";
+import { storeBrowserPassword } from "@/lib/client/credentials";
 import { useCiclo } from "@/lib/client/ciclo-context";
 import { AppShell } from "@/components/app-shell";
 import { PhraseQrCode } from "@/components/phrase-qr-code";
+import { SavePhraseForm } from "@/components/save-phrase-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 type Method = "choose" | "email" | "phrase";
@@ -46,8 +47,7 @@ export default function OnboardingPage() {
     }
     try {
       setBusy(true);
-      await storeBrowserPassword(PHRASE_USERNAME, wallet.mnemonic);
-      await unlock(wallet.mnemonic, { create: true });
+      await unlock(wallet.mnemonic, { create: true, persist: true });
       router.push("/app");
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : t.errorGeneric;
@@ -70,7 +70,7 @@ export default function OnboardingPage() {
     try {
       setBusy(true);
       setError(null);
-      await createEmailAccount(email, password);
+      await createEmailAccount(email, password, { persist: true });
       await storeBrowserPassword(email.trim().toLowerCase(), password);
       router.push("/app");
     } catch (cause) {
@@ -145,26 +145,28 @@ export default function OnboardingPage() {
                 onChange={(event) => setEmail(event.target.value)}
               />
               <Label htmlFor="ciclo-password">{t.password}</Label>
-              <Input
+              <PasswordInput
                 id="ciclo-password"
                 name="new-password"
-                type="password"
                 autoComplete="new-password"
                 required
                 minLength={8}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                showLabel={t.showPassword}
+                hideLabel={t.hidePassword}
               />
               <Label htmlFor="ciclo-confirm">{t.confirmPassword}</Label>
-              <Input
+              <PasswordInput
                 id="ciclo-confirm"
                 name="new-password-confirm"
-                type="password"
                 autoComplete="new-password"
                 required
                 minLength={8}
                 value={confirm}
                 onChange={(event) => setConfirm(event.target.value)}
+                showLabel={t.showPassword}
+                hideLabel={t.hidePassword}
               />
               <p className="text-xs text-muted-foreground">{t.passwordHint}</p>
               {error ? <p className="text-sm text-destructive">{error}</p> : null}
@@ -186,77 +188,51 @@ export default function OnboardingPage() {
             </Button>
           ) : null}
           {wallet && step === "show" ? (
-            <Card className="mt-6">
-              <form
-                className="flex flex-col gap-3"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  void storeBrowserPassword(PHRASE_USERNAME, wallet.mnemonic);
-                  setStep("confirm");
-                }}
-              >
-                <input
-                  type="text"
-                  name="username"
-                  autoComplete="username"
-                  defaultValue={PHRASE_USERNAME}
-                  readOnly
-                  className="sr-only"
-                  tabIndex={-1}
-                  aria-hidden
-                />
-                <input
-                  type="text"
-                  name="password"
-                  autoComplete="new-password"
-                  value={wallet.mnemonic}
-                  readOnly
-                  className="sr-only"
-                  tabIndex={-1}
-                  aria-hidden
-                />
-                <ol className="grid grid-cols-2 gap-2 text-sm">
-                  {words.map((word, index) => (
-                    <li key={`${word}-${index}`} className="rounded-lg bg-secondary px-3 py-2">
-                      <span className="text-muted-foreground">{index + 1}.</span> {word}
-                    </li>
-                  ))}
-                </ol>
-                <div className="flex flex-col items-center gap-2 py-1">
-                  <PhraseQrCode mnemonic={wallet.mnemonic} label={t.backupQrLabel} />
-                  <p className="text-center text-xs text-muted-foreground">{t.backupQrHint}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="flex-1"
-                    onClick={async () => {
-                      await navigator.clipboard.writeText(wallet.mnemonic);
-                      setCopied(true);
-                    }}
-                  >
-                    {copied ? t.copied : t.copy}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => {
-                      const blob = new Blob([wallet.mnemonic], { type: "text/plain" });
-                      const url = URL.createObjectURL(blob);
-                      const anchor = document.createElement("a");
-                      anchor.href = url;
-                      anchor.download = "ciclo-recovery-phrase.txt";
-                      anchor.click();
-                      URL.revokeObjectURL(url);
-                    }}
-                  >
-                    {t.download}
-                  </Button>
-                </div>
-                <Button type="submit">{t.saveInBrowser}</Button>
-              </form>
+            <Card className="mt-6 flex flex-col gap-3">
+              <ol className="grid grid-cols-2 gap-2 text-sm">
+                {words.map((word, index) => (
+                  <li key={`${word}-${index}`} className="rounded-lg bg-secondary px-3 py-2">
+                    <span className="text-muted-foreground">{index + 1}.</span> {word}
+                  </li>
+                ))}
+              </ol>
+              <div className="flex flex-col items-center gap-2 py-1">
+                <PhraseQrCode mnemonic={wallet.mnemonic} label={t.backupQrLabel} />
+                <p className="text-center text-xs text-muted-foreground">{t.backupQrHint}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(wallet.mnemonic);
+                    setCopied(true);
+                  }}
+                >
+                  {copied ? t.copied : t.copy}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    const blob = new Blob([wallet.mnemonic], { type: "text/plain" });
+                    const url = URL.createObjectURL(blob);
+                    const anchor = document.createElement("a");
+                    anchor.href = url;
+                    anchor.download = "ciclo-recovery-phrase.txt";
+                    anchor.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                >
+                  {t.download}
+                </Button>
+              </div>
+              <SavePhraseForm key={wallet.mnemonic} mnemonic={wallet.mnemonic} t={t} />
+              <Button type="button" onClick={() => setStep("confirm")}>
+                {t.next}
+              </Button>
             </Card>
           ) : null}
           {wallet && step === "confirm" ? (

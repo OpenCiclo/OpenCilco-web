@@ -26,16 +26,21 @@ import {
   LOCALE_KEY,
   LUNAR_PHASES_ENABLED_KEY,
   LUNAR_PHASES_VISIBLE_KEY,
-  MNEMONIC_KEY,
   VISUAL_SEASONS_KEY,
+  clearStoredMnemonic,
   migrateBrowserStorage,
   parseLunarPhasesEnabled,
   parseLunarPhasesVisible,
   parseVisualSeasons,
+  readUnlockState,
+  writeStoredMnemonic,
 } from "@/lib/client/storage-migrate";
 import { syncPoolIfDue, revokePoolContribution } from "@/lib/pool-sync";
 import { DIARY_SCHEMA_VERSION, emptyDiary, parseDiary, type Diary } from "@/lib/diary";
 import { messages, type Locale } from "@/lib/i18n";
+
+type UnlockOptions = { create?: boolean; persist?: boolean };
+type PersistOptions = { persist?: boolean };
 
 type CicloContextValue = {
   ready: boolean;
@@ -52,9 +57,10 @@ type CicloContextValue = {
   setLunarPhasesEnabled: (enabled: boolean) => void;
   setLunarPhasesVisible: (visible: boolean) => void;
   startOnboarding: () => Wallet;
-  unlock: (mnemonic: string, options?: { create?: boolean }) => Promise<void>;
-  createEmailAccount: (email: string, password: string) => Promise<Wallet>;
-  unlockWithPassword: (email: string, password: string) => Promise<void>;
+  unlock: (mnemonic: string, options?: UnlockOptions) => Promise<void>;
+  createEmailAccount: (email: string, password: string, options?: PersistOptions) => Promise<Wallet>;
+  unlockWithPassword: (email: string, password: string, options?: PersistOptions) => Promise<void>;
+  changePassword: (email: string, currentPassword: string, nextPassword: string) => Promise<void>;
   persistDiary: (next: Diary) => Promise<void>;
   enablePoolOptIn: () => Promise<void>;
   disablePoolOptIn: () => Promise<void>;
@@ -74,6 +80,10 @@ async function postRecoveryKit(email: string, kit: WrappedKit) {
   if (!response.ok) throw new Error("Recovery kit was not saved");
 }
 
+function persistFlag(options?: PersistOptions): boolean {
+  return options?.persist !== false;
+}
+
 export function CicloProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [wallet, setWallet] = useState<Wallet | null>(null);
@@ -87,7 +97,6 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
   const t = messages[locale];
 
   const hydrate = useCallback(async (nextWallet: Wallet, fallbackLocale: Locale) => {
-    sessionStorage.setItem(MNEMONIC_KEY, nextWallet.mnemonic);
     setWallet(nextWallet);
     const vault = await fetchVault();
     if (vault?.ciphertext) {
@@ -110,7 +119,7 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     migrateBrowserStorage();
     const storedLocale = (localStorage.getItem(LOCALE_KEY) as Locale | null) ?? "es";
-    const mnemonic = sessionStorage.getItem(MNEMONIC_KEY);
+    const unlockState = readUnlockState();
     void (async () => {
       try {
         await Promise.resolve();
@@ -121,15 +130,15 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
         setLunarPhasesVisibleState(
           parseLunarPhasesVisible(localStorage.getItem(LUNAR_PHASES_VISIBLE_KEY)),
         );
-        if (!mnemonic) {
+        if (!unlockState.mnemonic) {
           setDiary(emptyDiary(storedLocale));
           return;
         }
-        const nextWallet = unlockWallet(mnemonic);
-        await loginWithWallet(nextWallet);
+        const nextWallet = unlockWallet(unlockState.mnemonic);
+        await loginWithWallet(nextWallet, undefined, unlockState.persistCookie);
         await hydrate(nextWallet, storedLocale);
       } catch {
-        sessionStorage.removeItem(MNEMONIC_KEY);
+        clearStoredMnemonic();
         setDiary(emptyDiary(storedLocale));
       } finally {
         setReady(true);
@@ -153,19 +162,25 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
   );
 
   const unlock = useCallback(
-    async (mnemonic: string, options?: { create?: boolean }) => {
+    async (mnemonic: string, options?: UnlockOptions) => {
+      const persist = persistFlag(options);
       const nextWallet = unlockWallet(mnemonic);
       if (options?.create) {
         const seed = emptyDiary(locale);
         const sealed = await encryptAesGcm(nextWallet.aesKey, utf8ToBytes(JSON.stringify(seed)));
-        await loginWithWallet(nextWallet, {
-          ciphertext: sealed.ciphertext,
-          nonce: sealed.nonce,
-          schemaVersion: DIARY_SCHEMA_VERSION,
-        });
+        await loginWithWallet(
+          nextWallet,
+          {
+            ciphertext: sealed.ciphertext,
+            nonce: sealed.nonce,
+            schemaVersion: DIARY_SCHEMA_VERSION,
+          },
+          persist,
+        );
       } else {
-        await loginWithWallet(nextWallet);
+        await loginWithWallet(nextWallet, undefined, persist);
       }
+      writeStoredMnemonic(nextWallet.mnemonic, persist);
       await hydrate(nextWallet, locale);
     },
     [hydrate, locale],
@@ -205,22 +220,28 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
       },
       startOnboarding: () => createWallet(),
       unlock,
-      createEmailAccount: async (email, password) => {
+      createEmailAccount: async (email, password, options) => {
+        const persist = persistFlag(options);
         const nextWallet = createWallet();
         const kit = await wrapMnemonic(nextWallet.mnemonic, password);
         saveLocalKit(email, kit);
         const seed: Diary = { ...emptyDiary(locale), recoveryEmailSet: true };
         const sealed = await encryptAesGcm(nextWallet.aesKey, utf8ToBytes(JSON.stringify(seed)));
-        await loginWithWallet(nextWallet, {
-          ciphertext: sealed.ciphertext,
-          nonce: sealed.nonce,
-          schemaVersion: DIARY_SCHEMA_VERSION,
-        });
+        await loginWithWallet(
+          nextWallet,
+          {
+            ciphertext: sealed.ciphertext,
+            nonce: sealed.nonce,
+            schemaVersion: DIARY_SCHEMA_VERSION,
+          },
+          persist,
+        );
         await postRecoveryKit(email, kit);
+        writeStoredMnemonic(nextWallet.mnemonic, persist);
         await hydrate(nextWallet, locale);
         return nextWallet;
       },
-      unlockWithPassword: async (email, password) => {
+      unlockWithPassword: async (email, password, options) => {
         const normalized = normalizeEmail(email);
         let kit = loadLocalKit(normalized);
         if (!kit) {
@@ -229,11 +250,29 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
         try {
           const mnemonic = await unwrapMnemonic(kit, password);
           saveLocalKit(normalized, kit);
-          await unlock(mnemonic);
+          await unlock(mnemonic, { persist: persistFlag(options) });
         } catch (cause) {
           if (cause instanceof InvalidCredentialsError) throw cause;
           throw new InvalidCredentialsError();
         }
+      },
+      changePassword: async (email, currentPassword, nextPassword) => {
+        if (!wallet) throw new Error("Locked");
+        const normalized = normalizeEmail(email);
+        let kit = loadLocalKit(normalized);
+        if (!kit) {
+          kit = await fetchRemoteKit(normalized);
+        }
+        let recovered: string;
+        try {
+          recovered = await unwrapMnemonic(kit, currentPassword);
+        } catch {
+          throw new InvalidCredentialsError();
+        }
+        if (recovered !== wallet.mnemonic) throw new InvalidCredentialsError();
+        const nextKit = await wrapMnemonic(wallet.mnemonic, nextPassword);
+        saveLocalKit(normalized, nextKit);
+        await postRecoveryKit(normalized, nextKit);
       },
       persistDiary,
       enablePoolOptIn: async () => {
@@ -250,14 +289,14 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
       },
       wipe: async () => {
         await deleteAccount();
-        sessionStorage.removeItem(MNEMONIC_KEY);
+        clearStoredMnemonic();
         clearLocalKits();
         setWallet(null);
         setDiary(emptyDiary(locale));
       },
       signOut: async () => {
         await logoutSession();
-        sessionStorage.removeItem(MNEMONIC_KEY);
+        clearStoredMnemonic();
         setWallet(null);
       },
     }),

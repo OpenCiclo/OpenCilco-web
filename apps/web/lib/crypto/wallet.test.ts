@@ -52,4 +52,13 @@ describe("wallet crypto", () => {
     const recovered = await unwrapMnemonic(kit, "correct horse");
     expect(recovered).toBe(wallet.mnemonic);
   });
+
+  it("re-wraps the mnemonic under a new password without changing it", async () => {
+    const wallet = createWallet();
+    const first = await wrapMnemonic(wallet.mnemonic, "old-password");
+    const recovered = await unwrapMnemonic(first, "old-password");
+    const second = await wrapMnemonic(recovered, "new-password");
+    expect(await unwrapMnemonic(second, "new-password")).toBe(wallet.mnemonic);
+    await expect(unwrapMnemonic(second, "old-password")).rejects.toThrow();
+  });
 });

@@ -9,6 +9,8 @@ The browser still creates a 12-word phrase in the background. Your password **wr
 - Email cannot decrypt the diary by itself.
 - Sign-in on a new device: same email and password. If this browser does not have the kit yet, the app downloads the **encrypted** kit (rate-limited). The password unwraps it locally. You do not need to open your inbox.
 - The browser can save the password like any other site.
+- **Keep me signed in** (on by default) stores the unlock secret on this device so you do not type the password every visit. Sign out clears it. Anyone with this browser profile can open the diary until then.
+- You can **change the password** in Settings while signed in. That re-wraps the same phrase. It does not re-encrypt the diary, and it is not a reset by email.
 
 If you forget the password **and** you never saved the phrase, the hosted diary cannot be recovered. That is intentional.
 
@@ -17,6 +19,8 @@ If you forget the password **and** you never saved the phrase, the hosted diary 
 You hold the phrase. There is no mailbox row. We cannot show the phrase again if you lose it.
 
 Save it in the browser’s password manager, or write it down somewhere you actually control. Anyone with the phrase can decrypt the diary on a new device.
+
+On the 12-word setup screen, **Save in the browser** is a normal username + password form (the phrase is the password). The app cannot force the manager to store it; accept the browser prompt if it appears. Copy and download still work.
 
 Settings (and the 12-word setup screen) can also show a QR of the **same** phrase. It is not a new secret. Anyone who photographs it can open the diary.
 

@@ -1,0 +1,5 @@
+<!-- Brand mark from the marketing header: filled primary circle + inner dot. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Ciclo">
+  <circle cx="16" cy="16" r="16" fill="#24272a" />
+  <circle cx="16" cy="16" r="5" fill="#fcfcfc" />
+</svg>

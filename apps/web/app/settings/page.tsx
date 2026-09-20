@@ -4,16 +4,17 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { useCiclo } from "@/lib/client/ciclo-context";
+import { InvalidCredentialsError, useCiclo } from "@/lib/client/ciclo-context";
 import { lastEmail } from "@/lib/client/kit-store";
-import { PHRASE_USERNAME, storeBrowserPassword } from "@/lib/client/credentials";
+import { storeBrowserPassword } from "@/lib/client/credentials";
 import { diaryToCsv, diaryToJson, mergeDiaries, parseImportedFile, previewImport } from "@/lib/diary-io";
 import { otherLocale } from "@/lib/i18n";
 import { AppShell } from "@/components/app-shell";
 import { PhraseQrCode } from "@/components/phrase-qr-code";
+import { SavePhraseForm } from "@/components/save-phrase-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 function download(filename: string, body: string, type: string) {
@@ -42,14 +43,20 @@ export default function SettingsPage() {
     persistDiary,
     wipe,
     signOut,
+    changePassword,
   } = useCiclo();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState(() => lastEmail());
   const [browserPassword, setBrowserPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [nextPassword, setNextPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordBusy, setPasswordBusy] = useState(false);
   const [researchOk, setResearchOk] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [showPhrase, setShowPhrase] = useState(false);
+  const canChangePassword = diary.recoveryEmailSet || Boolean(lastEmail());
   const [importPreview, setImportPreview] = useState<{ days: number; starts: number; raw: string } | null>(
     null,
   );
@@ -147,6 +154,90 @@ export default function SettingsPage() {
       <Card className="mt-4 rounded-3xl border-primary/20 bg-primary/5 p-4 text-sm leading-6 text-muted-foreground">
         {t.noResetHint}
       </Card>
+      {canChangePassword ? (
+        <Card className="mt-4 flex flex-col gap-3 rounded-3xl">
+          <h2 className="font-medium">{t.changePassword}</h2>
+          <p className="text-xs text-muted-foreground">{t.changePasswordHint}</p>
+          <form
+            className="flex flex-col gap-3"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (nextPassword.length < 8) {
+                setMessage(t.passwordTooShort);
+                return;
+              }
+              if (nextPassword !== confirmPassword) {
+                setMessage(t.passwordMismatch);
+                return;
+              }
+              setPasswordBusy(true);
+              void changePassword(email, currentPassword, nextPassword)
+                .then(async () => {
+                  await storeBrowserPassword(email.trim().toLowerCase(), nextPassword);
+                  setCurrentPassword("");
+                  setNextPassword("");
+                  setConfirmPassword("");
+                  setMessage(t.changePasswordOk);
+                })
+                .catch((cause) => {
+                  setMessage(cause instanceof InvalidCredentialsError ? t.invalidCredentials : t.errorGeneric);
+                })
+                .finally(() => {
+                  setPasswordBusy(false);
+                });
+            }}
+          >
+            <Label htmlFor="settings-change-email">{t.email}</Label>
+            <Input
+              id="settings-change-email"
+              name="username"
+              type="email"
+              autoComplete="username"
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+            <Label htmlFor="settings-current-password">{t.currentPassword}</Label>
+            <PasswordInput
+              id="settings-current-password"
+              name="current-password"
+              autoComplete="current-password"
+              required
+              value={currentPassword}
+              onChange={(event) => setCurrentPassword(event.target.value)}
+              showLabel={t.showPassword}
+              hideLabel={t.hidePassword}
+            />
+            <Label htmlFor="settings-new-password">{t.newPassword}</Label>
+            <PasswordInput
+              id="settings-new-password"
+              name="new-password"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              value={nextPassword}
+              onChange={(event) => setNextPassword(event.target.value)}
+              showLabel={t.showPassword}
+              hideLabel={t.hidePassword}
+            />
+            <Label htmlFor="settings-confirm-password">{t.confirmPassword}</Label>
+            <PasswordInput
+              id="settings-confirm-password"
+              name="new-password-confirm"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              showLabel={t.showPassword}
+              hideLabel={t.hidePassword}
+            />
+            <Button type="submit" disabled={passwordBusy}>
+              {t.changePassword}
+            </Button>
+          </form>
+        </Card>
+      ) : null}
       <Card className="mt-4 flex flex-col gap-3 rounded-3xl">
         <Button
           variant="outline"
@@ -214,10 +305,8 @@ export default function SettingsPage() {
             event.preventDefault();
             if (email && browserPassword) {
               await storeBrowserPassword(email.trim().toLowerCase(), browserPassword);
-            } else {
-              await storeBrowserPassword(PHRASE_USERNAME, wallet.mnemonic);
+              setMessage(t.savedInBrowser);
             }
-            setMessage(t.savedInBrowser);
           }}
         >
           <Label htmlFor="settings-email">{t.email}</Label>
@@ -230,16 +319,18 @@ export default function SettingsPage() {
             onChange={(event) => setEmail(event.target.value)}
           />
           <Label htmlFor="settings-browser-password">{t.password}</Label>
-          <Input
+          <PasswordInput
             id="settings-browser-password"
             name="password"
-            type="password"
             autoComplete="current-password"
             value={browserPassword}
             onChange={(event) => setBrowserPassword(event.target.value)}
+            showLabel={t.showPassword}
+            hideLabel={t.hidePassword}
           />
           <Button type="submit">{t.saveInBrowser}</Button>
         </form>
+        <SavePhraseForm mnemonic={wallet.mnemonic} t={t} />
         <button type="button" className="text-left text-sm underline" onClick={() => setShowPhrase((v) => !v)}>
           {showPhrase ? t.hideBackupPhrase : t.showBackupPhrase}
         </button>

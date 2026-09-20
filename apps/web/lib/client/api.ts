@@ -14,6 +14,7 @@ async function parseJson(response: Response) {
 export async function loginWithWallet(
   wallet: Wallet,
   vault?: { ciphertext: string; nonce: string; schemaVersion: number },
+  persist = true,
 ) {
   const challenge = await parseJson(
     await fetch("/api/auth/challenge", {
@@ -36,6 +37,7 @@ export async function loginWithWallet(
         ciphertext: vault?.ciphertext,
         nonceVault: vault?.nonce,
         schemaVersion: vault?.schemaVersion,
+        persist,
       }),
     }),
   );

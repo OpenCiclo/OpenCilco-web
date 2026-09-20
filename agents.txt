@@ -103,8 +103,8 @@ Intermenstrual bleeding is a symptom, never a period start.
 - HKDF-SHA-256 info labels are `oddy-aes-v1` and `oddy-sign-v1` in `wallet.ts`. Changing them breaks existing vaults.
 - AES-256-GCM for diary. Ed25519 for login challenge signatures.
 - Email path: password wraps mnemonic (PBKDF2-SHA-256 + AES-GCM). Server stores HMAC(email) + wrapped kit. `POST /api/recovery/fetch` returns ciphertext only. Server must never unwrap.
-- No host-side password reset. Lost password + lost phrase ⇒ lost hosted diary. Export/import restores data, not the old key.
-- Session cookie; legacy name `oddy_session` still recognized.
+- No host-side password reset (magic link / email alone). Changing the wrap password while unlocked is allowed: re-wrap the mnemonic; do not rotate AES or re-encrypt the diary. Lost password + lost phrase ⇒ lost hosted diary. Export/import restores data, not the old key.
+- Session cookie; legacy name `oddy_session` still recognized. Optional persist unlock writes `ciclo.mnemonic` to localStorage; otherwise sessionStorage only. Never send the mnemonic to the server.
 - localStorage keys migrated `oddy.*` → `ciclo.*` in `storage-migrate.ts`. Keep that one-way migrate.
 
 ## Research pool

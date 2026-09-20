@@ -18,6 +18,7 @@ export async function POST(request: Request) {
     ciphertext?: string;
     nonceVault?: string;
     schemaVersion?: number;
+    persist?: boolean;
   };
   const pubkeyHash = body.pubkeyHash?.trim().toLowerCase();
   const pubkey = body.pubkey?.trim().toLowerCase();
@@ -71,6 +72,6 @@ export async function POST(request: Request) {
     });
     created = true;
   }
-  await setSessionCookie(pubkeyHash);
+  await setSessionCookie(pubkeyHash, body.persist !== false);
   return Response.json({ ok: true, created });
 }

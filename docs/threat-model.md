@@ -13,13 +13,14 @@ This is a living document for the Python engine and the V1 web app. It is not a 
 - BIP39 mnemonic, HKDF-derived AES key, Ed25519 signing seed
 - Passphrase used to wrap the optional recovery kit (the user's account password on the email path)
 - Wrapped kit cached in `localStorage` on a given browser
+- Optional persisted mnemonic in `localStorage` when “keep signed in” is on
 - Consent flags (recovery email / research pool)
 
 ## Trust boundaries
 
 ```text
 Browser memory     — plaintext diary, keys, forecast
-Browser storage    — encrypted vault cache, wrapped kit, “already contributed”
+Browser storage    — encrypted vault cache, wrapped kit, optional persisted mnemonic, “already contributed”
 User network       — ciphertext, signatures, email lookup fetch, optional length list
 OpenCiclo host / Neon   — ciphertext, pubkey, HMAC(email), anonymous pool rows
 ```
@@ -46,6 +47,7 @@ Process memory on a shared computer is still in scope for the user (shoulder sur
 | Password manager | Phrase or password stored by the browser | Same as any site; user can decline; never sent to OpenCiclo as a login API |
 | Wrapped kit in localStorage | Offline brute-force of the password | PBKDF2 600k; kit is still ciphertext |
 | XSS | Script reads keys in memory | Strict CSP, no third-party scripts, no analytics |
+| Persist unlock (`localStorage` mnemonic) | Device access or XSS can open the diary after the tab is closed | Off by unchecking “Keep me signed in”; sessionStorage only then; cleared on sign-out; documented in Help |
 | Research join | Re-identify contributors | No `account_id` / pubkey on pool rows; no mapping table |
 | Recovery mailbox | Email ↔ account link | Optional; HMAC lookup; documented as PII |
 | Challenge replay | Stolen login | Short-lived nonces, one-use |

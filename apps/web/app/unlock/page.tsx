@@ -11,7 +11,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Input, Textarea } from "@/components/ui/input";
+import { Input, PasswordInput, Textarea } from "@/components/ui/input";
 
 const PhraseQrScanner = dynamic(
   () => import("@/components/phrase-qr-scanner").then((mod) => mod.PhraseQrScanner),
@@ -24,14 +24,17 @@ export default function UnlockPage() {
   const { t, unlock, unlockWithPassword } = useCiclo();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("email");
-  const [email, setEmail] = useState(() => lastEmail());
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phrase, setPhrase] = useState("");
+  const [keepLoggedIn, setKeepLoggedIn] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
+    const stored = lastEmail();
+    if (stored) setEmail(stored);
     void getBrowserPassword().then((cred) => {
       if (!cred) return;
       if (cred.id.includes("@")) {
@@ -50,7 +53,7 @@ export default function UnlockPage() {
     try {
       setBusy(true);
       setError(null);
-      await unlockWithPassword(email, password);
+      await unlockWithPassword(email, password, { persist: keepLoggedIn });
       await storeBrowserPassword(email.trim().toLowerCase(), password);
       router.push("/app");
     } catch (cause) {
@@ -69,7 +72,7 @@ export default function UnlockPage() {
       setBusy(true);
       setError(null);
       const normalized = nextPhrase.trim().toLowerCase().replace(/\s+/g, " ");
-      await unlock(normalized);
+      await unlock(normalized, { persist: keepLoggedIn });
       await storeBrowserPassword(PHRASE_USERNAME, normalized);
       router.push("/app");
     } catch (cause) {
@@ -83,6 +86,22 @@ export default function UnlockPage() {
     event.preventDefault();
     await unlockFromPhrase(phrase);
   }
+
+  const keepLoggedInField = (
+    <label htmlFor="keep-logged-in" className="flex items-start gap-2 text-sm">
+      <input
+        id="keep-logged-in"
+        type="checkbox"
+        className="mt-1"
+        checked={keepLoggedIn}
+        onChange={(event) => setKeepLoggedIn(event.target.checked)}
+      />
+      <span>
+        {t.keepLoggedIn}
+        <span className="mt-0.5 block text-xs text-muted-foreground">{t.keepLoggedInHint}</span>
+      </span>
+    </label>
+  );
 
   return (
     <AppShell>
@@ -113,15 +132,17 @@ export default function UnlockPage() {
               onChange={(event) => setEmail(event.target.value)}
             />
             <Label htmlFor="unlock-password">{t.password}</Label>
-            <Input
+            <PasswordInput
               id="unlock-password"
               name="password"
-              type="password"
               autoComplete="current-password"
               required
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              showLabel={t.showPassword}
+              hideLabel={t.hidePassword}
             />
+            {keepLoggedInField}
             <p className="text-xs text-muted-foreground">{t.emailLoginHint}</p>
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             <Button type="submit" disabled={busy}>
@@ -150,6 +171,7 @@ export default function UnlockPage() {
               value={phrase}
               onChange={(event) => setPhrase(event.target.value)}
             />
+            {keepLoggedInField}
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             <Button type="submit" disabled={busy}>
               {t.unlock}

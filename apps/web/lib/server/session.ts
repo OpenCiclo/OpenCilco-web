@@ -40,7 +40,7 @@ function parseSession(raw: string | undefined): { pubkeyHash: string } | null {
   return { pubkeyHash: payload.h };
 }
 
-export async function setSessionCookie(pubkeyHash: string): Promise<void> {
+export async function setSessionCookie(pubkeyHash: string, persist = true): Promise<void> {
   const payload: SessionPayload = {
     h: pubkeyHash,
     e: Math.floor(Date.now() / 1000) + MAX_AGE_SECONDS,
@@ -53,7 +53,7 @@ export async function setSessionCookie(pubkeyHash: string): Promise<void> {
     sameSite: "lax",
     secure: sessionCookieSecure(),
     path: "/",
-    maxAge: MAX_AGE_SECONDS,
+    ...(persist ? { maxAge: MAX_AGE_SECONDS } : {}),
   });
   store.delete(LEGACY_COOKIE);
 }
