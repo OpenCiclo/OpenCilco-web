@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LEARN_ARTICLES } from "@/lib/learn/articles";
-import { listLearnForConsole, loadDbLearnEntries } from "@/lib/learn/catalog";
+import { listLearnForConsole } from "@/lib/learn/catalog";
+import { loadDbLearnEntries } from "@/lib/learn/load";
 import { requireConsoleApi } from "@/lib/server/console";
 
 export const dynamic = "force-dynamic";

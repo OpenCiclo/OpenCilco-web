@@ -2,15 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-  LEARN_ARTICLES,
   isLearnCategory,
   type LearnArticle,
   type LearnArticleCopy,
   type LearnCategory,
   type LearnSource,
 } from "@/lib/learn/articles";
-import { learnArticles } from "@/lib/db/schema";
-import { getDb } from "@/lib/db";
 
 export const LEARN_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -232,19 +229,18 @@ export function dbRowToCatalogEntry(row: {
   };
 }
 
-export async function loadDbLearnEntries(): Promise<CatalogDbEntry[]> {
-  try {
-    const db = getDb();
-    const rows = await db.select().from(learnArticles);
-    return rows
-      .map((row) => dbRowToCatalogEntry(row))
-      .filter((row): row is CatalogDbEntry => row !== null);
-  } catch {
-    return [];
-  }
-}
-
-export async function loadPublishedLearnArticles(): Promise<LearnArticle[]> {
-  const dbRows = await loadDbLearnEntries();
-  return mergeLearnCatalog(LEARN_ARTICLES, dbRows);
-}
+export type LearnEditorPayload = {
+  slug: string;
+  isNew: boolean;
+  origin: "shipped" | "database" | "new";
+  hasShipped: boolean;
+  status: LearnStatus;
+  article: {
+    slug: string;
+    category: string;
+    reviewedAt: string;
+    sources: LearnSource[];
+    es: LearnArticleCopy | null;
+    en: LearnArticleCopy | null;
+  };
+};

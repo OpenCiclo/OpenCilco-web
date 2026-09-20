@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
   // Docker/self-host needs standalone. On Vercel, Next 16.3 + this flag
   // skips next-server.js.nft.json and the platform packager then fails.
   output: process.env.VERCEL ? undefined : "standalone",
+  serverExternalPackages: ["postgres"],
   poweredByHeader: false,
   outputFileTracingIncludes: {
     "/help": ["./content/help/**/*"],

@@ -15,26 +15,12 @@ import {
   parseLearnArticleCopy,
   parseLearnSources,
   type CatalogDbEntry,
-  type LearnStatus,
+  type LearnEditorPayload,
 } from "@/lib/learn/catalog";
 import { learnArticles } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
 
-export type LearnEditorPayload = {
-  slug: string;
-  isNew: boolean;
-  origin: "shipped" | "database" | "new";
-  hasShipped: boolean;
-  status: LearnStatus;
-  article: {
-    slug: string;
-    category: string;
-    reviewedAt: string;
-    sources: { label: string; href: string }[];
-    es: ReturnType<typeof parseLearnArticleCopy>;
-    en: ReturnType<typeof parseLearnArticleCopy>;
-  };
-};
+export type { LearnEditorPayload };
 
 function revalidateLearn(): void {
   revalidatePath("/learn");

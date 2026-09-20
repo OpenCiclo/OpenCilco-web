@@ -4,7 +4,8 @@
 import { and, count, gt, ne } from "drizzle-orm";
 
 import { LEARN_ARTICLES } from "@/lib/learn/articles";
-import { loadDbLearnEntries, mergeLearnCatalog } from "@/lib/learn/catalog";
+import { mergeLearnCatalog } from "@/lib/learn/catalog";
+import { loadDbLearnEntries } from "@/lib/learn/load";
 import { accounts, recoveryMailboxes, researchContributions } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
 

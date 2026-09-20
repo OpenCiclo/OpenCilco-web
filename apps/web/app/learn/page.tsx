@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LearnIndex } from "@/components/learn/learn-index";
-import { loadPublishedLearnArticles } from "@/lib/learn/catalog";
+import { loadPublishedLearnArticles } from "@/lib/learn/load";
 
 export const dynamic = "force-dynamic";
 
