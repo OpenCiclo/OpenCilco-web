@@ -13,6 +13,27 @@ export class InvalidCredentialsError extends Error {
   }
 }
 
+export class MailNotConfiguredError extends Error {
+  constructor() {
+    super("MAIL_NOT_CONFIGURED");
+    this.name = "MailNotConfiguredError";
+  }
+}
+
+export class RateLimitedError extends Error {
+  constructor() {
+    super("RATE_LIMITED");
+    this.name = "RateLimitedError";
+  }
+}
+
+export class InvalidConfirmError extends Error {
+  constructor() {
+    super("INVALID_CONFIRM");
+    this.name = "InvalidConfirmError";
+  }
+}
+
 function hasBrowserStorage() {
   return typeof window !== "undefined";
 }
@@ -31,6 +52,15 @@ function loadAll(): Record<string, WrappedKit> {
 
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
+}
+
+export function maskEmail(email: string): string {
+  const normalized = normalizeEmail(email);
+  const at = normalized.indexOf("@");
+  if (at <= 0 || at === normalized.length - 1) return "***";
+  const local = normalized.slice(0, at);
+  const domain = normalized.slice(at + 1);
+  return `${local.charAt(0)}***@${domain}`;
 }
 
 export function saveLocalKit(email: string, kit: WrappedKit) {

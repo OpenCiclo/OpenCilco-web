@@ -31,7 +31,7 @@ Ciclo does not use Clerk or Auth0. You can create an account in two ways. In bot
 
 The server knows a public identifier derived from the secret (like an address), not the phrase or your password. Login is a signature of a short-lived challenge, proving you still hold the key. **Ciclo cannot reset your password or phrase** — that is intentional so nobody, including us, can read your diary on the server.
 
-On the email path, signing in on a new device uses the same email and password. If this browser does not have your wrapped key yet, the app downloads the **encrypted** kit automatically (rate-limited). Your password unwraps it locally. You do not need to open your inbox.
+On the email path, **creating** the account sends a 6-digit code to that inbox once. That proves the address is yours. It does not reset the password or open the diary. Signing in on a new device uses the same email and password. If this browser does not have your wrapped key yet, the app downloads the **encrypted** kit automatically (rate-limited). Your password unwraps it locally. After that first confirmation you do not need to open your inbox.
 
 ## What the server stores
 

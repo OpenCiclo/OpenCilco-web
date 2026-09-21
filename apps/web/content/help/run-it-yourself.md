@@ -24,6 +24,9 @@ Then:
 
 ```bash
 npx dotenv -e .env.local -- psql "$DATABASE_URL" -f drizzle/0000_init.sql
+npx dotenv -e .env.local -- psql "$DATABASE_URL" -f drizzle/0001_pool_upsert.sql
+npx dotenv -e .env.local -- psql "$DATABASE_URL" -f drizzle/0002_learn_articles.sql
+npx dotenv -e .env.local -- psql "$DATABASE_URL" -f drizzle/0003_mailbox_pending.sql
 npm run dev
 ```
 
@@ -39,6 +42,7 @@ docker compose up --build
 
 - App: http://localhost:3000
 - Postgres: `postgres://openciclo:openciclo@localhost:5432/openciclo`
+- Mailpit (signup codes): http://localhost:8025 — Compose sets `SMTP_HOST=mailpit`. Without SMTP or Resend, email signup returns 503.
 
 Compose binds the app to `127.0.0.1:3000` on the host. That is enough for a browser on the same machine.
 

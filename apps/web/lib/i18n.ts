@@ -13,7 +13,7 @@ const es = {
   recommended: "Recomendado",
   createWithEmail: "Correo y contraseña",
   createWithEmailHint:
-    "Entra en cualquier dispositivo con el mismo correo y contraseña. El diario se cifra en tu navegador; nosotras no podemos leerlo ni resetear tu contraseña.",
+    "Entra en cualquier dispositivo con el mismo correo y contraseña. Al crear la cuenta confirmas el buzón con un código. El diario se cifra en tu navegador; nosotras no podemos leerlo ni resetear tu contraseña.",
   superPrivateMode: "Modo super privado",
   superPrivateHint:
     "Sin correo. Guardas 12 palabras. Máxima privacidad. Si las pierdes, no hay recuperación — exporta una copia como backup.",
@@ -24,7 +24,7 @@ const es = {
   noResetHint:
     "Si olvidas tu contraseña o tu frase, el diario en la nube se pierde. Esto es intencional: protege tu privacidad. Haz export JSON/CSV mientras puedas.",
   emailLoginHint:
-    "Funciona en cualquier navegador con el mismo correo y contraseña. No hace falta abrir el correo para entrar.",
+    "La primera vez confirmas el buzón con un código. Después entras con correo y contraseña, sin abrir el inbox.",
   language: "Idioma",
   next: "Continuar",
   back: "Atrás",
@@ -60,7 +60,18 @@ const es = {
     "Estas 12 palabras son la llave de tu diario. Guárdalas en el navegador o en un sitio seguro. Ciclo no puede recuperarlas.",
   emailAccountTitle: "Correo y contraseña",
   emailAccountBody:
-    "Elige un correo y una contraseña (mín. 8 caracteres). Ciclo cifra el diario aquí. La contraseña nunca sale de tu dispositivo en claro.",
+    "Elige un correo y una contraseña (mín. 8 caracteres). Te enviaremos un código de 6 dígitos a ese buzón para confirmar que es tuyo. No es un enlace de reset. Ciclo cifra el diario aquí. La contraseña nunca sale de tu dispositivo en claro.",
+  verifyEmailTitle: "Confirma tu correo",
+  verifyEmailBody:
+    "Hemos enviado un código de 6 dígitos a {email}. Ábrelo una vez para demostrar que el buzón es tuyo. No resetea la contraseña ni abre el diario.",
+  verifyEmailCode: "Código de 6 dígitos",
+  resendCode: "Reenviar código",
+  changeEmail: "Cambiar correo",
+  codeSent: "Código enviado.",
+  mailNotConfigured:
+    "Este servidor no puede enviar correo ahora. Prueba más tarde o usa el modo super privado.",
+  tooManyEmailCodes: "Demasiados intentos. Espera un rato e inténtalo de nuevo.",
+  verifyEmailInvalid: "Ese código no es válido o ya caducó. Solicita uno nuevo.",
   copy: "Copiar",
   download: "Descargar",
   copied: "Copiada",
@@ -449,7 +460,7 @@ const en = {
   recommended: "Recommended",
   createWithEmail: "Email and password",
   createWithEmailHint:
-    "Sign in on any device with the same email and password. Your diary is encrypted in the browser; we cannot read it or reset your password.",
+    "Sign in on any device with the same email and password. Creating the account confirms the inbox with a code. Your diary is encrypted in the browser; we cannot read it or reset your password.",
   superPrivateMode: "Super private mode",
   superPrivateHint:
     "No email. You keep 12 words. Maximum privacy. If you lose them, there is no recovery — export a backup.",
@@ -460,7 +471,7 @@ const en = {
   noResetHint:
     "If you forget your password or phrase, the hosted diary is gone. This is intentional: it protects your privacy. Export JSON/CSV while you can.",
   emailLoginHint:
-    "Works in any browser with the same email and password. You do not need to open your inbox to sign in.",
+    "The first time you create the account you confirm the inbox with a code. After that, sign in with email and password without opening mail.",
   language: "Language",
   next: "Continue",
   back: "Back",
@@ -496,7 +507,18 @@ const en = {
     "These 12 words are the key to your diary. Save them in the browser or somewhere safe. Ciclo cannot recover them.",
   emailAccountTitle: "Email and password",
   emailAccountBody:
-    "Choose an email and a password (min. 8 characters). Ciclo encrypts the diary here. Your password never leaves the device in the clear.",
+    "Choose an email and a password (min. 8 characters). We send a 6-digit code to that inbox once to prove it is yours. It is not a reset link. Ciclo encrypts the diary here. Your password never leaves the device in the clear.",
+  verifyEmailTitle: "Confirm your email",
+  verifyEmailBody:
+    "We sent a 6-digit code to {email}. Open it once to prove the inbox is yours. It does not reset the password or open the diary.",
+  verifyEmailCode: "6-digit code",
+  resendCode: "Resend code",
+  changeEmail: "Change email",
+  codeSent: "Code sent.",
+  mailNotConfigured:
+    "This server cannot send mail right now. Try later or use super private mode.",
+  tooManyEmailCodes: "Too many attempts. Wait a bit and try again.",
+  verifyEmailInvalid: "That code is invalid or expired. Request a new one.",
   copy: "Copy",
   download: "Download",
   copied: "Copied",

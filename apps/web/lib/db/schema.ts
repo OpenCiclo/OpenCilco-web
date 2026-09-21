@@ -31,6 +31,23 @@ export const recoveryMailboxes = pgTable("recovery_mailboxes", {
   accountId: uuid("account_id")
     .notNull()
     .references(() => accounts.id, { onDelete: "cascade" }),
+  verifiedAt: timestamp("verified_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const mailboxPending = pgTable("mailbox_pending", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  emailLookup: text("email_lookup").notNull().unique(),
+  accountId: uuid("account_id")
+    .notNull()
+    .references(() => accounts.id, { onDelete: "cascade" }),
+  wrappedSecret: text("wrapped_secret").notNull(),
+  wrapNonce: text("wrap_nonce").notNull(),
+  wrapSalt: text("wrap_salt").notNull(),
+  wrapParams: jsonb("wrap_params").notNull(),
+  codeHash: text("code_hash").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  attemptCount: integer("attempt_count").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

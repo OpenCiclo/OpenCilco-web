@@ -44,7 +44,7 @@ export const HELP_ARTICLES: HelpArticleMeta[] = [
   {
     slug: "host-on-vercel",
     title: "Host on Vercel",
-    summary: "Root directory apps/web, Neon Postgres, the env vars you actually need.",
+    summary: "Root directory apps/web, Neon Postgres, Resend DNS, the env vars you actually need.",
     section: "hosting",
   },
   {

@@ -39,8 +39,8 @@ Cursor: also see the short AGENTS.md at the repo root. Do not edit apps/web/AGEN
 ## Hosting
 
 - Intended production: Vercel project root directory `apps/web` + Neon Postgres.
-- Env: `DATABASE_URL`, `SESSION_SECRET`, `EMAIL_LOOKUP_SECRET`, `APP_URL` (no trailing slash). Optional `RESEND_API_KEY` / SMTP. Optional `CONSOLE_EMAILS` (comma-separated). If unset, `/console` is 404. Email sign-in does not require inbox magic links.
-- SQL: `apps/web/drizzle/0000_init.sql`, `0001_pool_upsert.sql`, `0002_learn_articles.sql`. No plaintext health columns.
+- Env: `DATABASE_URL`, `SESSION_SECRET`, `EMAIL_LOOKUP_SECRET`, `APP_URL` (no trailing slash). Email signup needs `RESEND_API_KEY` + `MAIL_FROM` (production) or SMTP (local Mailpit). If neither is set, email signup is 503. Optional `CONSOLE_EMAILS` (comma-separated). If unset, `/console` is 404. Day-to-day email sign-in does not use inbox magic links; signup sends a 6-digit code once.
+- SQL: `apps/web/drizzle/0000_init.sql`, `0001_pool_upsert.sql`, `0002_learn_articles.sql`, `0003_mailbox_pending.sql`. No plaintext health columns. Never store plaintext email — HMAC `email_lookup` only.
 - Local UI: `cd apps/web && npm run dev` with `.env.local` from `.env.template`. You cannot see or edit `.env`.
 - Local stack: `docker compose up --build` from repo root. `APP_URL` is `http://localhost:3000`. Bind is `127.0.0.1:3000`.
 - Do not document or reintroduce Tailscale / serve tunnels. Public access is Vercel.
@@ -78,7 +78,7 @@ V1 predicts next period start and cycle length only. Optional observations are i
 apps/web/app/                    App Router. Tabs: / calendar, /patterns, /learn, /settings
 apps/web/app/console/            Operator panel (stats + Learn CMS). Allowlist CONSOLE_EMAILS via HMAC mailbox. Noindex.
 apps/web/app/help/               Help index + [slug]
-apps/web/app/api/                auth challenge/verify, vault, recovery fetch, research pool, console
+apps/web/app/api/                auth challenge/verify, vault, recovery register/confirm/fetch, research pool, console
 apps/web/components/calendar/    status card, season overlay, day sheet
 apps/web/lib/forecast/           TS port of shrinkage + Laplace; must match Python fixtures
 apps/web/lib/cycle/phases.ts     observed vs estimated phase heuristic (NOT the forecast engine)
@@ -104,8 +104,9 @@ Intermenstrual bleeding is a symptom, never a period start.
 - Device generates BIP39 12-word mnemonic.
 - HKDF-SHA-256 info labels are `oddy-aes-v1` and `oddy-sign-v1` in `wallet.ts`. Changing them breaks existing vaults.
 - AES-256-GCM for diary. Ed25519 for login challenge signatures.
-- Email path: password wraps mnemonic (PBKDF2-SHA-256 + AES-GCM). Server stores HMAC(email) + wrapped kit. `POST /api/recovery/fetch` returns ciphertext only. Server must never unwrap.
-- No host-side password reset (magic link / email alone). Changing the wrap password while unlocked is allowed: re-wrap the mnemonic; do not rotate AES or re-encrypt the diary. Lost password + lost phrase ⇒ lost hosted diary. Export/import restores data, not the old key.
+- Email path: password wraps mnemonic (PBKDF2-SHA-256 + AES-GCM). Server stores HMAC(email) + wrapped kit only after a 6-digit inbox code (`mailbox_pending` then `recovery_mailboxes.verified_at`). Plaintext email is never a Postgres column. `POST /api/recovery/fetch` returns ciphertext only for verified mailboxes. Server must never unwrap. Do not use `recovery_tokens` (that would look like a password reset).
+- No host-side password reset (magic link / email alone). The signup code authorizes inserting the already-wrapped kit; it does not unwrap. Changing the wrap password while unlocked is allowed: re-wrap the mnemonic (own verified mailbox, no new code); do not rotate AES or re-encrypt the diary. Lost password + lost phrase ⇒ lost hosted diary. Export/import restores data, not the old key.
+- Deleting the account row cascades `recovery_mailboxes` and `mailbox_pending` (`ON DELETE CASCADE`), so that HMAC is free for someone else to verify.
 - Session cookie; legacy name `oddy_session` still recognized. Optional persist unlock writes `ciclo.mnemonic` to localStorage; otherwise sessionStorage only. Never send the mnemonic to the server.
 - localStorage keys migrated `oddy.*` → `ciclo.*` in `storage-migrate.ts`. Keep that one-way migrate.
 
@@ -116,7 +117,7 @@ POST integer cycle lengths, no pubkey. Server assigns opaque pool_id. Device rem
 ## Operator console
 
 - Route `/console`. Not linked from marketing or the tab bar. `robots: noindex`.
-- Gate: `CONSOLE_EMAILS`. Compare HMAC(email) to `recovery_mailboxes.email_lookup` for the session account. Never store or log plaintext operator emails in the panel.
+- Gate: `CONSOLE_EMAILS`. Compare HMAC(email) to `recovery_mailboxes.email_lookup` for the session account where `verified_at` is set. Never store or log plaintext operator emails in the panel.
 - Phrase-only accounts cannot match the allowlist.
 - Stats are row counts and timestamps only. Do not list `pubkey_hash`, emails, ciphertext, or `cycle_lengths`. Do not join research rows to accounts.
 - Learn CMS writes `learn_articles`. Deleting a DB row restores the shipped article if that slug exists in `LEARN_ARTICLES`.

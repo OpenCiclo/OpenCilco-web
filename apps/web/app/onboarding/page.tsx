@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 
 import { type Wallet } from "@/lib/crypto/wallet";
 import { storeBrowserPassword } from "@/lib/client/credentials";
-import { useCiclo } from "@/lib/client/ciclo-context";
+import {
+  InvalidConfirmError,
+  MailNotConfiguredError,
+  RateLimitedError,
+  useCiclo,
+} from "@/lib/client/ciclo-context";
+import { maskEmail } from "@/lib/client/kit-store";
 import { AppShell } from "@/components/app-shell";
 import { PhraseQrCode } from "@/components/phrase-qr-code";
 import { SavePhraseForm } from "@/components/save-phrase-form";
@@ -17,12 +23,15 @@ import { Label } from "@/components/ui/label";
 type Method = "choose" | "email" | "phrase";
 
 export default function OnboardingPage() {
-  const { t, startOnboarding, unlock, createEmailAccount } = useCiclo();
+  const { t, startOnboarding, unlock, createEmailAccount, confirmEmailAccount, resendEmailCode } =
+    useCiclo();
   const router = useRouter();
   const [method, setMethod] = useState<Method>("choose");
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState<"show" | "confirm">("show");
+  const [emailPhase, setEmailPhase] = useState<"form" | "code">("form");
+  const [code, setCode] = useState("");
   const [guess, setGuess] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,10 +81,42 @@ export default function OnboardingPage() {
       setError(null);
       await createEmailAccount(email, password, { persist: true });
       await storeBrowserPassword(email.trim().toLowerCase(), password);
+      setEmailPhase("code");
+      setCode("");
+    } catch (cause) {
+      if (cause instanceof MailNotConfiguredError) setError(t.mailNotConfigured);
+      else if (cause instanceof RateLimitedError) setError(t.tooManyEmailCodes);
+      else setError(t.errorGeneric);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function finishEmailCode(event: React.FormEvent) {
+    event.preventDefault();
+    try {
+      setBusy(true);
+      setError(null);
+      await confirmEmailAccount(code);
       router.push("/app");
     } catch (cause) {
-      const message = cause instanceof Error ? cause.message : t.errorGeneric;
-      setError(message);
+      if (cause instanceof InvalidConfirmError) setError(t.verifyEmailInvalid);
+      else setError(t.errorGeneric);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resend() {
+    try {
+      setBusy(true);
+      setError(null);
+      await resendEmailCode();
+      setError(t.codeSent);
+    } catch (cause) {
+      if (cause instanceof MailNotConfiguredError) setError(t.mailNotConfigured);
+      else if (cause instanceof RateLimitedError) setError(t.tooManyEmailCodes);
+      else setError(t.errorGeneric);
     } finally {
       setBusy(false);
     }
@@ -90,8 +131,16 @@ export default function OnboardingPage() {
           type="button"
           className="mb-4 text-sm underline"
           onClick={() => {
+            if (method === "email" && emailPhase === "code") {
+              setEmailPhase("form");
+              setCode("");
+              setError(null);
+              return;
+            }
             setMethod("choose");
             setWallet(null);
+            setEmailPhase("form");
+            setCode("");
             setError(null);
           }}
         >
@@ -128,7 +177,7 @@ export default function OnboardingPage() {
         </>
       ) : null}
 
-      {method === "email" ? (
+      {method === "email" && emailPhase === "form" ? (
         <>
           <h1 className="text-2xl font-semibold">{t.emailAccountTitle}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{t.emailAccountBody}</p>
@@ -173,6 +222,59 @@ export default function OnboardingPage() {
               <Button type="submit" disabled={busy}>
                 {t.createAccount}
               </Button>
+            </form>
+          </Card>
+        </>
+      ) : null}
+
+      {method === "email" && emailPhase === "code" ? (
+        <>
+          <h1 className="text-2xl font-semibold">{t.verifyEmailTitle}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {t.verifyEmailBody.replace("{email}", maskEmail(email))}
+          </p>
+          <Card className="mt-4">
+            <form className="flex flex-col gap-3" onSubmit={(event) => void finishEmailCode(event)}>
+              <Label htmlFor="ciclo-email-code">{t.verifyEmailCode}</Label>
+              <Input
+                id="ciclo-email-code"
+                name="one-time-code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                autoFocus
+                required
+                minLength={6}
+                maxLength={6}
+                pattern="[0-9]{6}"
+                value={code}
+                onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+              />
+              {error ? (
+                <p
+                  className={
+                    error === t.codeSent ? "text-sm text-muted-foreground" : "text-sm text-destructive"
+                  }
+                >
+                  {error}
+                </p>
+              ) : null}
+              <Button type="submit" disabled={busy || code.length !== 6}>
+                {t.next}
+              </Button>
+              <Button type="button" variant="outline" disabled={busy} onClick={() => void resend()}>
+                {t.resendCode}
+              </Button>
+              <button
+                type="button"
+                className="text-sm underline"
+                onClick={() => {
+                  setEmailPhase("form");
+                  setCode("");
+                  setError(null);
+                }}
+              >
+                {t.changeEmail}
+              </button>
             </form>
           </Card>
         </>

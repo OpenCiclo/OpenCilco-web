@@ -14,7 +14,10 @@ import {
   putVault,
 } from "@/lib/client/api";
 import {
+  InvalidConfirmError,
   InvalidCredentialsError,
+  MailNotConfiguredError,
+  RateLimitedError,
   clearLocalKits,
   fetchRemoteKit,
   lastEmail,
@@ -58,7 +61,9 @@ type CicloContextValue = {
   setLunarPhasesVisible: (visible: boolean) => void;
   startOnboarding: () => Wallet;
   unlock: (mnemonic: string, options?: UnlockOptions) => Promise<void>;
-  createEmailAccount: (email: string, password: string, options?: PersistOptions) => Promise<Wallet>;
+  createEmailAccount: (email: string, password: string, options?: PersistOptions) => Promise<void>;
+  confirmEmailAccount: (code: string) => Promise<void>;
+  resendEmailCode: () => Promise<void>;
   unlockWithPassword: (email: string, password: string, options?: PersistOptions) => Promise<void>;
   changePassword: (email: string, currentPassword: string, nextPassword: string) => Promise<void>;
   persistDiary: (next: Diary) => Promise<void>;
@@ -71,13 +76,33 @@ type CicloContextValue = {
 
 const CicloContext = createContext<CicloContextValue | null>(null);
 
-async function postRecoveryKit(email: string, kit: WrappedKit) {
+type PendingEmailSignup = {
+  wallet: Wallet;
+  email: string;
+  kit: WrappedKit;
+  persist: boolean;
+};
+
+async function postRecoveryKit(email: string, kit: WrappedKit, locale: Locale): Promise<{ pending: boolean }> {
   const response = await fetch("/api/recovery/register", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ email, ...kit }),
+    body: JSON.stringify({ email, locale, ...kit }),
   });
+  if (response.status === 503) throw new MailNotConfiguredError();
+  if (response.status === 429) throw new RateLimitedError();
   if (!response.ok) throw new Error("Recovery kit was not saved");
+  const payload = (await response.json()) as { pending?: boolean };
+  return { pending: payload.pending !== false };
+}
+
+async function confirmRecoveryCode(code: string) {
+  const response = await fetch("/api/recovery/confirm", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+  if (!response.ok) throw new InvalidConfirmError();
 }
 
 function persistFlag(options?: PersistOptions): boolean {
@@ -92,6 +117,7 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
   const [lunarPhasesEnabled, setLunarPhasesEnabledState] = useState(true);
   const [lunarPhasesVisible, setLunarPhasesVisibleState] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingSignup, setPendingSignup] = useState<PendingEmailSignup | null>(null);
 
   const locale = diary.locale;
   const t = messages[locale];
@@ -222,24 +248,45 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
       unlock,
       createEmailAccount: async (email, password, options) => {
         const persist = persistFlag(options);
-        const nextWallet = createWallet();
+        const normalized = normalizeEmail(email);
+        let nextWallet = pendingSignup?.wallet;
+        if (!nextWallet) {
+          nextWallet = createWallet();
+          const seed: Diary = { ...emptyDiary(locale), recoveryEmailSet: true };
+          const sealed = await encryptAesGcm(nextWallet.aesKey, utf8ToBytes(JSON.stringify(seed)));
+          await loginWithWallet(
+            nextWallet,
+            {
+              ciphertext: sealed.ciphertext,
+              nonce: sealed.nonce,
+              schemaVersion: DIARY_SCHEMA_VERSION,
+            },
+            persist,
+          );
+        }
         const kit = await wrapMnemonic(nextWallet.mnemonic, password);
-        saveLocalKit(email, kit);
-        const seed: Diary = { ...emptyDiary(locale), recoveryEmailSet: true };
-        const sealed = await encryptAesGcm(nextWallet.aesKey, utf8ToBytes(JSON.stringify(seed)));
-        await loginWithWallet(
-          nextWallet,
-          {
-            ciphertext: sealed.ciphertext,
-            nonce: sealed.nonce,
-            schemaVersion: DIARY_SCHEMA_VERSION,
-          },
-          persist,
-        );
-        await postRecoveryKit(email, kit);
-        writeStoredMnemonic(nextWallet.mnemonic, persist);
+        const result = await postRecoveryKit(normalized, kit, locale);
+        if (!result.pending) {
+          saveLocalKit(normalized, kit);
+          writeStoredMnemonic(nextWallet.mnemonic, persist);
+          setPendingSignup(null);
+          await hydrate(nextWallet, locale);
+          return;
+        }
+        setPendingSignup({ wallet: nextWallet, email: normalized, kit, persist });
+      },
+      confirmEmailAccount: async (code) => {
+        if (!pendingSignup) throw new InvalidConfirmError();
+        await confirmRecoveryCode(code);
+        saveLocalKit(pendingSignup.email, pendingSignup.kit);
+        writeStoredMnemonic(pendingSignup.wallet.mnemonic, pendingSignup.persist);
+        const nextWallet = pendingSignup.wallet;
+        setPendingSignup(null);
         await hydrate(nextWallet, locale);
-        return nextWallet;
+      },
+      resendEmailCode: async () => {
+        if (!pendingSignup) throw new InvalidConfirmError();
+        await postRecoveryKit(pendingSignup.email, pendingSignup.kit, locale);
       },
       unlockWithPassword: async (email, password, options) => {
         const normalized = normalizeEmail(email);
@@ -272,7 +319,8 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
         if (recovered !== wallet.mnemonic) throw new InvalidCredentialsError();
         const nextKit = await wrapMnemonic(wallet.mnemonic, nextPassword);
         saveLocalKit(normalized, nextKit);
-        await postRecoveryKit(normalized, nextKit);
+        const result = await postRecoveryKit(normalized, nextKit, locale);
+        if (result.pending) throw new Error("Recovery kit was not saved");
       },
       persistDiary,
       enablePoolOptIn: async () => {
@@ -307,6 +355,7 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
       locale,
       lunarPhasesEnabled,
       lunarPhasesVisible,
+      pendingSignup,
       persistDiary,
       ready,
       t,
@@ -325,4 +374,10 @@ export function useCiclo() {
   return ctx;
 }
 
-export { lastEmail, InvalidCredentialsError };
+export {
+  lastEmail,
+  InvalidConfirmError,
+  InvalidCredentialsError,
+  MailNotConfiguredError,
+  RateLimitedError,
+};

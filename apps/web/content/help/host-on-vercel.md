@@ -18,8 +18,10 @@ On that database, run the SQL in:
 
 - `apps/web/drizzle/0000_init.sql`
 - `apps/web/drizzle/0001_pool_upsert.sql`
+- `apps/web/drizzle/0002_learn_articles.sql`
+- `apps/web/drizzle/0003_mailbox_pending.sql`
 
-Those files create accounts, ciphertext columns, sessions, and the anonymous research pool. They do not create health columns.
+Those files create accounts, ciphertext columns, sessions, the anonymous research pool, Learn CMS rows, and email confirmation pending. They do not create health columns. `0003` adds `verified_at` on existing mailboxes (set to `created_at`) so current accounts keep working.
 
 ## 3. Environment variables
 
@@ -30,9 +32,18 @@ Set these in Vercel (Production, and Preview if you use it):
 - `EMAIL_LOOKUP_SECRET` — long random string. Used to HMAC emails so the database is not a marketing list.
 - `APP_URL` — the public origin, for example `https://your-app.vercel.app`. No trailing slash.
 
+Email + password **signup** needs outbound mail. Vercel does not send mail itself.
+
+- `RESEND_API_KEY` — [Resend](https://resend.com) API key (production).
+- `MAIL_FROM` — for example `Ciclo <noreply@openciclo.com>`. Verify that domain in Resend and add the SPF, DKIM, and DMARC records Resend shows (Cloudflare or your DNS host).
+
+Without Resend (or SMTP), creating an email account returns 503. Super private (12-word) signup does not send mail.
+
+Day-to-day sign-in is still email + password. The inbox is opened **once** at signup, for the 6-digit code. There is no password-reset link.
+
 Optional:
 
-- `RESEND_API_KEY` and `MAIL_FROM` if you send mail. Email + password sign-in does **not** require opening an inbox; the password unwraps the key in the browser.
+- `CONSOLE_EMAILS` — comma-separated operator emails for `/console`. Compared as HMAC against a **verified** mailbox.
 
 Do not put period dates, phrases, or AES keys in env vars or logs.
 

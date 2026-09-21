@@ -3,7 +3,7 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { InvalidCredentialsError, fetchRemoteKit, normalizeEmail } from "./kit-store";
+import { InvalidCredentialsError, fetchRemoteKit, maskEmail, normalizeEmail } from "./kit-store";
 
 describe("kit-store", () => {
   afterEach(() => {
@@ -12,6 +12,11 @@ describe("kit-store", () => {
 
   it("normalizes email addresses", () => {
     expect(normalizeEmail("  User@Example.COM ")).toBe("user@example.com");
+  });
+
+  it("masks local mailbox labels for the confirmation screen", () => {
+    expect(maskEmail("bob@example.com")).toBe("b***@example.com");
+    expect(maskEmail("  Ada@OpenCiclo.com ")).toBe("a***@openciclo.com");
   });
 
   it("throws InvalidCredentialsError when fetch fails", async () => {

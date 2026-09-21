@@ -7,7 +7,8 @@ Ciclo does not use Clerk, Auth0, or a “forgot password” email that can open 
 The browser still creates a 12-word phrase in the background. Your password **wraps** that phrase (PBKDF2 + AES-GCM). The server stores the wrapped kit and an HMAC of your email.
 
 - Email cannot decrypt the diary by itself.
-- Sign-in on a new device: same email and password. If this browser does not have the kit yet, the app downloads the **encrypted** kit (rate-limited). The password unwraps it locally. You do not need to open your inbox.
+- Sign-in on a new device: same email and password. If this browser does not have the kit yet, the app downloads the **encrypted** kit (rate-limited). The password unwraps it locally. Day to day you do not need to open your inbox.
+- **Creating** the account is different: Ciclo sends a 6-digit code to that inbox once. Without the code, nobody can claim your address. The code does not unwrap the phrase, reset the password, or open the diary.
 - The browser can save the password like any other site.
 - **Keep me signed in** (on by default) stores the unlock secret on this device so you do not type the password every visit. Sign out clears it. Anyone with this browser profile can open the diary until then.
 - You can **change the password** in Settings while signed in. That re-wraps the same phrase. It does not re-encrypt the diary, and it is not a reset by email.

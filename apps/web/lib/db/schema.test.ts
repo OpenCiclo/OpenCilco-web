@@ -42,4 +42,29 @@ describe("database schema", () => {
     expect(learn.toLowerCase()).not.toContain("ciphertext");
     expect(learn.toLowerCase()).not.toContain("cycle_lengths");
   });
+
+  it("confirms mailboxes via hashed codes without plaintext email or health columns", () => {
+    const pending = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), "../../drizzle/0003_mailbox_pending.sql"),
+      "utf8",
+    );
+    expect(pending).toContain("CREATE TABLE IF NOT EXISTS mailbox_pending");
+    expect(pending).toContain("email_lookup");
+    expect(pending).toContain("code_hash");
+    expect(pending).toContain("ON DELETE CASCADE");
+    expect(pending).toContain("verified_at");
+    expect(pending).not.toContain("recovery_tokens");
+    expect(pending.toLowerCase()).not.toContain("email text");
+    expect(pending.toLowerCase()).not.toContain("cycle_lengths");
+    expect(pending.toLowerCase()).not.toContain("pubkey");
+    expect(pending.toLowerCase()).not.toContain("ciphertext");
+  });
+
+  it("cascades mailbox rows when an account is deleted", () => {
+    const init = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), "../../drizzle/0000_init.sql"),
+      "utf8",
+    );
+    expect(init).toMatch(/REFERENCES accounts\(id\) ON DELETE CASCADE/);
+  });
 });

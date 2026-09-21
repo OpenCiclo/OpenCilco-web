@@ -25,7 +25,8 @@ The `openciclo` package must remain importable and testable with no sockets, cre
 | Store | Contents | Linked to account? |
 | --- | --- | --- |
 | `accounts` | `pubkey_hash`, Ed25519 pubkey, AES-GCM ciphertext + nonce of the diary (schema v6: period starts, daily flow/mucus/symptoms/notes, forecasting preference). No plaintext health columns. | Yes (the account *is* the pubkey) |
-| `recovery_mailboxes` | HMAC(email), wrapped mnemonic, `account_id` | Yes — this is optional PII |
+| `recovery_mailboxes` | HMAC(email), wrapped mnemonic, `account_id`, `verified_at` | Yes — this is optional PII. Created only after the 6-digit inbox code. |
+| `mailbox_pending` | HMAC(email), wrapped kit, hashed 6-digit code, expiry | Yes — dropped on confirm or when the account is deleted (`ON DELETE CASCADE`) |
 | `research_contributions` | `pool_id`, integer cycle lengths, `created_at` | **No** — never symptoms, mucus, or dates |
 | Device | “already contributed” flag, session keys, wrapped kit cache | Local only |
 
@@ -37,7 +38,7 @@ Never write period dates, recovery phrases, passphrases, AES keys, or forecasts 
 
 ## Email + password sign-in
 
-The mailbox stores a kit wrapped with PBKDF2-SHA-256 (WebCrypto) and AES-GCM under the user's password. On sign-in, the client may fetch that **ciphertext** from `POST /api/recovery/fetch` (rate-limited) if it is not already in `localStorage`. Server-side code must not attempt to unwrap it. The password never leaves the browser in the clear.
+The mailbox stores a kit wrapped with PBKDF2-SHA-256 (WebCrypto) and AES-GCM under the user's password. Signup confirms the inbox with a hashed 6-digit code (`POST /api/recovery/register` then `POST /api/recovery/confirm`). Until confirm, there is no `recovery_mailboxes` row and `POST /api/recovery/fetch` returns nothing. On sign-in, the client may fetch that **ciphertext** from fetch (rate-limited) if it is not already in `localStorage`. Server-side code must not attempt to unwrap it. The password never leaves the browser in the clear. The plaintext email is used only in memory to send the code and is not stored in Postgres.
 
 If a design would let the host restore the mnemonic from email alone, reject the design.
 

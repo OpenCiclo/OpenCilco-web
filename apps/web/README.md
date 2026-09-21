@@ -17,10 +17,10 @@ There is **no** Clerk, Auth0, or analytics SDK.
 
 1. Create a Vercel project with **root directory** `apps/web`.
 2. Provision **Neon** Postgres (Vercel Marketplace) and set `DATABASE_URL`.
-3. Run `apps/web/drizzle/0000_init.sql` (and `0001_pool_upsert.sql` if you need the pool upsert) on that database.
+3. Run `apps/web/drizzle/0000_init.sql` through `0003_mailbox_pending.sql` on that database.
 4. Set `SESSION_SECRET` and `EMAIL_LOOKUP_SECRET` to long random strings.
 5. Set `APP_URL` to the production URL (for example `https://your-app.vercel.app`).
-6. Optional: `RESEND_API_KEY` if you send mail. Email sign-in does not depend on inbox links.
+6. For email signup: `RESEND_API_KEY` and `MAIL_FROM`, plus the DNS records Resend asks for. Day-to-day sign-in does not use inbox links; creating the account sends a 6-digit code once. Without mail, email signup returns 503.
 
 Copy `apps/web/.env.template` to `.env.local` for local Next.js. Do not commit secrets. Plain-language walkthrough: Help article *Host on Vercel* (`/help/host-on-vercel`).
 
@@ -33,6 +33,7 @@ cd apps/web
 cp .env.template .env.local
 # fill DATABASE_URL, SESSION_SECRET, EMAIL_LOOKUP_SECRET, APP_URL=http://localhost:3000
 npx dotenv -e .env.local -- psql "$DATABASE_URL" -f drizzle/0000_init.sql
+npx dotenv -e .env.local -- psql "$DATABASE_URL" -f drizzle/0003_mailbox_pending.sql
 npm run dev
 ```
 

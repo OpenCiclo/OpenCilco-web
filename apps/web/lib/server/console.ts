@@ -1,7 +1,7 @@
 // Copyright © 2026 Emma Flora Harbison & Luis Rey Sánchez
 // SPDX-License-Identifier: Apache-2.0
 
-import { eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 
 import { parseConsoleEmails, consoleIsEnabled } from "@/lib/console/emails";
@@ -37,7 +37,9 @@ export async function readConsoleAccess(): Promise<ConsoleAccess> {
     const mailboxRows = await db
       .select({ emailLookup: recoveryMailboxes.emailLookup })
       .from(recoveryMailboxes)
-      .where(eq(recoveryMailboxes.accountId, account.id));
+      .where(
+        and(eq(recoveryMailboxes.accountId, account.id), isNotNull(recoveryMailboxes.verifiedAt)),
+      );
     if (mailboxRows.length === 0) return { status: "forbidden" };
 
     const allowed = new Set(emails.map((email) => emailLookup(email)));

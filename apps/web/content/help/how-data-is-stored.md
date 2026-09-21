@@ -24,7 +24,7 @@ A new symptom label or a day note does not change the database schema. It stays 
 
 - **Account identity** — a public key hash, not your phrase.
 - **Diary ciphertext** — unreadable without the device key.
-- **Email accounts only** — an HMAC of your email, plus a copy of the phrase **wrapped with your password**. Email alone cannot unwrap it.
+- **Email accounts only** — an HMAC of your email, plus a copy of the phrase **wrapped with your password**. The plaintext email is never stored. Signup writes a short-lived `mailbox_pending` row and emails a hashed 6-digit code; the mailbox row is created only after that code is confirmed (`verified_at`). Email alone cannot unwrap the kit.
 - **Optional research rows** — cycle lengths as whole numbers, with a random pool id. No link from your account to that id.
 
 The password never leaves the browser in the clear. Login is a short-lived cryptographic challenge: you prove you still hold the key.
