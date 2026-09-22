@@ -5,17 +5,18 @@ import nodemailer from "nodemailer";
 import { Resend } from "resend";
 
 import { mailFrom } from "@/lib/server/env";
+import { confirmationEmail, type MailLocale } from "@/lib/server/mailbox-email";
 
 export function mailTransportConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY?.trim() || process.env.SMTP_HOST?.trim());
 }
 
-export async function sendMail(to: string, subject: string, text: string): Promise<void> {
+export async function sendMail(to: string, subject: string, text: string, html?: string): Promise<void> {
   const from = mailFrom();
   const resendKey = process.env.RESEND_API_KEY?.trim();
   if (resendKey) {
     const resend = new Resend(resendKey);
-    const result = await resend.emails.send({ from, to, subject, text });
+    const result = await resend.emails.send({ from, to, subject, text, html });
     if (result.error) {
       throw new Error("Mail send failed");
     }
@@ -33,38 +34,14 @@ export async function sendMail(to: string, subject: string, text: string): Promi
         ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS ?? "" }
         : undefined,
     });
-    await transporter.sendMail({ from, to, subject, text });
+    await transporter.sendMail({ from, to, subject, text, html });
     return;
   }
 
   throw new Error("Mail is not configured");
 }
 
-export async function sendMailboxCode(to: string, code: string, locale: "es" | "en"): Promise<void> {
-  if (locale === "en") {
-    await sendMail(
-      to,
-      "Your Ciclo confirmation code",
-      [
-        `Your Ciclo confirmation code is ${code}.`,
-        "",
-        "It expires in 15 minutes. This only proves the inbox is yours. It does not open the diary or change your password.",
-        "",
-        "If you did not create a Ciclo account, ignore this message.",
-      ].join("\n"),
-    );
-    return;
-  }
-
-  await sendMail(
-    to,
-    "Tu código de confirmación de Ciclo",
-    [
-      `Tu código de confirmación de Ciclo es ${code}.`,
-      "",
-      "Caduca en 15 minutos. Solo demuestra que el buzón es tuyo. No abre el diario ni cambia tu contraseña.",
-      "",
-      "Si no creaste una cuenta en Ciclo, ignora este mensaje.",
-    ].join("\n"),
-  );
+export async function sendMailboxCode(to: string, code: string, locale: MailLocale): Promise<void> {
+  const message = confirmationEmail(locale, code);
+  await sendMail(to, message.subject, message.text, message.html);
 }
