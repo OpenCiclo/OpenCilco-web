@@ -86,7 +86,7 @@
   --card-foreground: oklch(0.95 0.005 260);
   --popover: oklch(0.22 0.006 260);
   --popover-foreground: oklch(0.95 0.005 260);
-  --primary: oklch(0.74 0.13 12);
+  --primary: rgb(161, 74, 87);
   --primary-foreground: oklch(0.99 0.008 20);
   --secondary: oklch(0.27 0.006 260);
   --secondary-foreground: oklch(0.92 0.005 260);
@@ -97,14 +97,14 @@
   --destructive: oklch(0.68 0.17 22);
   --border: oklch(0.34 0.008 260);
   --input: oklch(0.34 0.008 260);
-  --ring: oklch(0.74 0.13 12);
+  --ring: rgb(161, 74, 87);
   --bleed: oklch(0.64 0.16 15);
   --bleed-foreground: oklch(0.99 0.008 20);
   --fertile: oklch(0.74 0.1 200);
   --fertile-foreground: oklch(0.88 0.06 200);
   --phase-follicular: oklch(0.34 0.04 45);
   --phase-luteal: oklch(0.32 0.04 330);
-  --chart-1: oklch(0.74 0.13 12);
+  --chart-1: rgb(161, 74, 87);
   --chart-2: oklch(0.78 0.11 45);
   --chart-3: oklch(0.74 0.1 200);
   --chart-4: oklch(0.7 0.1 330);
