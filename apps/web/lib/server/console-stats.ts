@@ -1,13 +1,14 @@
 // Copyright © 2026 Emma Flora Harbison & Luis Rey Sánchez
 // SPDX-License-Identifier: Apache-2.0
 
-import { and, count, gte, gt, lt, ne, sql } from "drizzle-orm";
+import { and, count, gte, gt, lt, ne, notInArray, sql } from "drizzle-orm";
 
 import { LEARN_ARTICLES } from "@/lib/learn/articles";
 import { mergeLearnCatalog } from "@/lib/learn/catalog";
 import { loadDbLearnEntries } from "@/lib/learn/load";
 import { accountActivityDays, accounts, recoveryMailboxes, researchContributions } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
+import { consoleAdminAccountIds } from "@/lib/server/account-activity";
 
 export type ConsoleDayCount = {
   day: string;
@@ -74,22 +75,25 @@ async function loadActivity(spanDays: number): Promise<{
   };
   try {
     const db = getDb();
+    const adminIds = await consoleAdminAccountIds();
+    const excludeAdmins =
+      adminIds.length > 0 ? notInArray(accountActivityDays.accountId, adminIds) : undefined;
     const today = utcDay(new Date());
     const day7 = utcDay(daysAgo(6));
     const day30 = utcDay(daysAgo(29));
     const day28 = utcDay(daysAgo(spanDays - 1));
     const distinct = sql<number>`count(distinct ${accountActivityDays.accountId})::int`;
     const [todayRows, weekRows, monthRows, byDay] = await Promise.all([
-      db.select({ n: count() }).from(accountActivityDays).where(gte(accountActivityDays.day, today)),
-      db.select({ n: distinct }).from(accountActivityDays).where(gte(accountActivityDays.day, day7)),
-      db.select({ n: distinct }).from(accountActivityDays).where(gte(accountActivityDays.day, day30)),
+      db.select({ n: count() }).from(accountActivityDays).where(and(gte(accountActivityDays.day, today), excludeAdmins)),
+      db.select({ n: distinct }).from(accountActivityDays).where(and(gte(accountActivityDays.day, day7), excludeAdmins)),
+      db.select({ n: distinct }).from(accountActivityDays).where(and(gte(accountActivityDays.day, day30), excludeAdmins)),
       db
         .select({
           day: accountActivityDays.day,
           count: sql<number>`count(*)::int`,
         })
         .from(accountActivityDays)
-        .where(gte(accountActivityDays.day, day28))
+        .where(and(gte(accountActivityDays.day, day28), excludeAdmins))
         .groupBy(accountActivityDays.day),
     ]);
     return {

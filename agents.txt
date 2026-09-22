@@ -119,7 +119,7 @@ POST integer cycle lengths, no pubkey. Server assigns opaque pool_id. Device rem
 - Route `/console`. Not linked from marketing or the tab bar. `robots: noindex`.
 - Gate: `CONSOLE_EMAILS`. Compare HMAC(email) to `recovery_mailboxes.email_lookup` for the session account where `verified_at` is set. Never store or log plaintext operator emails in the panel.
 - Phrase-only accounts cannot match the allowlist.
-- Stats are row counts and timestamps only. Sign-in writes `account_activity_days` (account id + UTC day) so the console can count unique opens. Do not list those rows, `pubkey_hash`, emails, ciphertext, or `cycle_lengths`. Do not join research rows to accounts.
+- Stats are row counts and timestamps only. Sign-in writes `account_activity_days` (account id + UTC day) so the console can count unique opens. Verified mailboxes whose HMAC is in `CONSOLE_EMAILS` are not counted. Do not list those rows, `pubkey_hash`, emails, ciphertext, or `cycle_lengths`. Do not join research rows to accounts.
 - Learn CMS writes `learn_articles`. Deleting a DB row restores the shipped article if that slug exists in `LEARN_ARTICLES`.
 
 ## What not to build here

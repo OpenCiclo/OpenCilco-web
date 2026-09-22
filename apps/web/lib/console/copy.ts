@@ -12,7 +12,7 @@ const COPY = {
     forbiddenBody:
       "La consola solo está abierta para correos de la lista CONSOLE_EMAILS. Entra con una cuenta de correo y contraseña de esa lista. Una cuenta solo con frase no sirve.",
     statsIntro:
-      "Conteos del host. Sin emails en claro y sin contenido del diario. “Abrieron la app” es un inicio de sesión, una vez por cuenta y día. El histórico de aperturas empieza al aplicar la migración 0004. “Guardados en el host” es una escritura del vault cifrado.",
+      "Conteos del host. Sin emails en claro y sin contenido del diario. “Abrieron la app” es un inicio de sesión, una vez por cuenta y día. Los correos de CONSOLE_EMAILS no cuentan. El histórico de aperturas empieza al aplicar la migración 0004. “Guardados en el host” es una escritura del vault cifrado.",
     accountsTotal: "Cuentas",
     accountsNew7d: "Nuevas (7 días)",
     accountsNew30d: "Nuevas (30 días)",
@@ -73,7 +73,7 @@ const COPY = {
     forbiddenBody:
       "The console is limited to emails in CONSOLE_EMAILS. Sign in with an email-and-password account on that list. A phrase-only account cannot match it.",
     statsIntro:
-      "Host counts only. No plaintext email and no diary contents. “Opened the app” is a sign-in, once per account per day. That history starts after migration 0004. “Saved on the host” means an encrypted vault write.",
+      "Host counts only. No plaintext email and no diary contents. “Opened the app” is a sign-in, once per account per day. Emails in CONSOLE_EMAILS are not counted. That history starts after migration 0004. “Saved on the host” means an encrypted vault write.",
     accountsTotal: "Accounts",
     accountsNew7d: "New (7 days)",
     accountsNew30d: "New (30 days)",
