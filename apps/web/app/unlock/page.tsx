@@ -12,7 +12,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Input, PasswordInput, Textarea } from "@/components/ui/input";
+import { Input, PasswordInput } from "@/components/ui/input";
 
 const PhraseQrScanner = dynamic(
   () => import("@/components/phrase-qr-scanner").then((mod) => mod.PhraseQrScanner),
@@ -165,12 +165,15 @@ export default function UnlockPage() {
               aria-hidden
             />
             <Label htmlFor="unlock-phrase">{t.phrase}</Label>
-            <Textarea
+            <PasswordInput
               id="unlock-phrase"
               name="password"
               autoComplete="current-password"
+              required
               value={phrase}
               onChange={(event) => setPhrase(event.target.value)}
+              showLabel={t.showPassword}
+              hideLabel={t.hidePassword}
             />
             {keepLoggedInField}
             {error ? <p className="text-sm text-destructive">{error}</p> : null}

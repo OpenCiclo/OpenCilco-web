@@ -99,7 +99,7 @@ const es = {
   saveInBrowser: "Guardar en el navegador",
   savedInBrowser: "El navegador puede pedirte guardar esto. Si aparece el aviso, acéptalo.",
   savePhraseInBrowserHint:
-    "Se guarda como cualquier otra contraseña o frase. No podemos forzar al gestor; si no aparece el aviso, usa copiar o descargar.",
+    "Escribe un nombre y pulsa guardar. El navegador puede pedirte guardar la frase. Si no aparece el aviso, pulsa otra vez.",
   passwordManagerAccount: "Nombre en el gestor",
   changePassword: "Cambiar contraseña",
   changePasswordHint:
@@ -107,11 +107,12 @@ const es = {
   currentPassword: "Contraseña actual",
   newPassword: "Nueva contraseña",
   changePasswordOk: "Contraseña actualizada.",
-  showBackupPhrase: "Ver frase de respaldo (avanzado)",
-  hideBackupPhrase: "Ocultar frase",
+  backupTitle: "Copia de seguridad",
+  showBackupPhrase: "Ver QR de la frase",
+  hideBackupPhrase: "Ocultar QR",
   backupPhraseHint: "Solo para modo super privado o copia manual. No hace falta si usas correo y contraseña.",
   backupQrHint:
-    "Este QR es la misma frase. Escanéalo en Entrar → Modo super privado. No lo muestres en una pantalla compartida: una foto abre la cuenta.",
+    "Este QR es la misma frase de 12 palabras. En otro dispositivo, entra en Entrar → Modo super privado → Escanear QR para abrir la cuenta sin teclearla. No lo muestres en una pantalla compartida: una foto abre la cuenta.",
   backupQrLabel: "Código QR de tu frase de respaldo",
   scanBackupQr: "Escanear QR",
   scanningQr: "Apunta al QR de la frase…",
@@ -193,7 +194,7 @@ const es = {
   researchMonthly:
     "Con la opción activada, Ciclo envía un resumen actualizado como mucho una vez al mes. Si corriges fechas en el diario, el próximo envío sustituye el anterior (mediante una clave anónima guardada solo en tu dispositivo).",
   researchConsent:
-    "Entiendo que no es una copia de seguridad y que puedo desactivarlo cuando quiera (al desactivar se borra la fila del pool asociada a esta clave anónima).",
+    "Entiendo que no es una copia de seguridad. Si lo desactivo, Ciclo deja de enviar datos nuevos. Lo que ya se envió se queda en el pool, anónimo, y no se borra.",
   poolOptInLabel: "Contribuir automáticamente (1 vez al mes)",
   poolOptInActive: "Contribución mensual activa.",
   poolLastSync: "Último envío: {date}",
@@ -577,7 +578,7 @@ const en = {
   saveInBrowser: "Save in the browser",
   savedInBrowser: "Your browser may ask to save this. If you see a prompt, accept it.",
   savePhraseInBrowserHint:
-    "This uses the same save dialog as any other password. We cannot force the manager to store it; if no prompt appears, copy or download the phrase.",
+    "Type a name and press save. The browser may ask to store the phrase. If no prompt appears, press save again.",
   passwordManagerAccount: "Name in the password manager",
   changePassword: "Change password",
   changePasswordHint:
@@ -585,11 +586,12 @@ const en = {
   currentPassword: "Current password",
   newPassword: "New password",
   changePasswordOk: "Password updated.",
-  showBackupPhrase: "Show backup phrase (advanced)",
-  hideBackupPhrase: "Hide phrase",
+  backupTitle: "Backup",
+  showBackupPhrase: "Show phrase QR",
+  hideBackupPhrase: "Hide QR",
   backupPhraseHint: "For super private mode or manual backup. Not needed if you use email and password.",
   backupQrHint:
-    "This QR is the same phrase. Scan it under Sign in → Super private mode. Do not show it on a shared screen: a photo opens the account.",
+    "This QR is the same 12-word phrase. On another device, open Sign in → Super private mode → Scan QR to sign in without typing it. Do not show it on a shared screen: a photo opens the account.",
   backupQrLabel: "QR code of your backup phrase",
   scanBackupQr: "Scan QR",
   scanningQr: "Point at the backup QR…",
@@ -671,7 +673,7 @@ const en = {
   researchMonthly:
     "When enabled, Ciclo sends an updated snapshot at most once a month. If you fix dates in your diary, the next upload replaces the previous row (via an anonymous key stored only on this device).",
   researchConsent:
-    "I understand this is not a backup and I can turn it off anytime (turning off deletes the pool row tied to this anonymous key).",
+    "I understand this is not a backup. Turning it off stops future uploads. What was already sent stays in the pool, anonymous, and is not deleted.",
   poolOptInLabel: "Contribute automatically (once a month)",
   poolOptInActive: "Monthly contribution is on.",
   poolLastSync: "Last upload: {date}",

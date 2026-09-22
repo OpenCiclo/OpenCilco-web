@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 
 import { InvalidCredentialsError, useCiclo } from "@/lib/client/ciclo-context";
 import { lastEmail } from "@/lib/client/kit-store";
@@ -17,6 +18,25 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input, PasswordInput } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+
+function SettingsDisclosure({ title, children }: { title: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Card className="mt-4 flex flex-col gap-3 rounded-3xl">
+      <button
+        type="button"
+        className="flex w-full items-center justify-between gap-3 text-left font-medium"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        {title}
+        <ChevronDown className={cn("size-5 shrink-0 transition-transform", open && "rotate-180")} aria-hidden />
+      </button>
+      {open ? children : null}
+    </Card>
+  );
+}
 
 function download(filename: string, body: string, type: string) {
   const blob = new Blob([body], { type });
@@ -206,8 +226,7 @@ export default function SettingsPage() {
         {t.noResetHint}
       </Card>
       {canChangePassword ? (
-        <Card className="mt-4 flex flex-col gap-3 rounded-3xl">
-          <h2 className="font-medium">{t.changePassword}</h2>
+        <SettingsDisclosure title={t.changePassword}>
           <p className="text-xs text-muted-foreground">{t.changePasswordHint}</p>
           <form
             className="flex flex-col gap-3"
@@ -287,9 +306,9 @@ export default function SettingsPage() {
               {t.changePassword}
             </Button>
           </form>
-        </Card>
+        </SettingsDisclosure>
       ) : null}
-      <Card className="mt-4 flex flex-col gap-3 rounded-3xl">
+      <SettingsDisclosure title={t.backupTitle}>
         <Button
           variant="outline"
           onClick={() => download("ciclo-diary.json", diaryToJson(diary), "application/json")}
@@ -347,9 +366,8 @@ export default function SettingsPage() {
             </Button>
           </>
         ) : null}
-      </Card>
-      <Card className="mt-4 flex flex-col gap-3 rounded-3xl">
-        <h2 className="font-medium">{t.saveInBrowser}</h2>
+      </SettingsDisclosure>
+      <SettingsDisclosure title={t.saveInBrowser}>
         <form
           className="flex flex-col gap-3"
           onSubmit={async (event) => {
@@ -386,16 +404,12 @@ export default function SettingsPage() {
           {showPhrase ? t.hideBackupPhrase : t.showBackupPhrase}
         </button>
         {showPhrase ? (
-          <>
-            <p className="text-xs text-muted-foreground">{t.backupPhraseHint}</p>
-            <p className="text-sm leading-6">{wallet.mnemonic}</p>
-            <div className="flex flex-col items-center gap-2">
-              <PhraseQrCode mnemonic={wallet.mnemonic} label={t.backupQrLabel} />
-              <p className="text-center text-xs text-muted-foreground">{t.backupQrHint}</p>
-            </div>
-          </>
+          <div className="flex flex-col items-center gap-2">
+            <PhraseQrCode mnemonic={wallet.mnemonic} label={t.backupQrLabel} />
+            <p className="text-center text-xs text-muted-foreground">{t.backupQrHint}</p>
+          </div>
         ) : null}
-      </Card>
+      </SettingsDisclosure>
       <Card className="mt-4 flex flex-col gap-3 rounded-3xl">
         <h2 className="font-medium">{t.researchTitle}</h2>
         <p className="text-sm text-muted-foreground">{t.researchBenefit}</p>

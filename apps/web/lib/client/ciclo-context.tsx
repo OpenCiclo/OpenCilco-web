@@ -40,7 +40,7 @@ import {
   readUnlockState,
   writeStoredMnemonic,
 } from "@/lib/client/storage-migrate";
-import { syncPoolIfDue, revokePoolContribution } from "@/lib/pool-sync";
+import { syncPoolIfDue } from "@/lib/pool-sync";
 import { DIARY_SCHEMA_VERSION, emptyDiary, parseDiary, type Diary } from "@/lib/diary";
 import { messages, type Locale } from "@/lib/i18n";
 import { COLOR_SCHEME_KEY, parseColorScheme, type ColorScheme } from "@/lib/client/color-scheme";
@@ -348,12 +348,9 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
         await persistDiary({ ...diary, poolOptIn: true });
       },
       disablePoolOptIn: async () => {
-        await revokePoolContribution(diary);
         await persistDiary({
           ...diary,
           poolOptIn: false,
-          poolContributorKey: null,
-          poolLastSyncedAt: null,
         });
       },
       wipe: async () => {

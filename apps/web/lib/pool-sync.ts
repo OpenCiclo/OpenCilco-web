@@ -58,15 +58,6 @@ export async function submitPoolContribution(diary: Diary): Promise<Diary> {
   return { ...withKey, poolLastSyncedAt: todayIsoUtc() };
 }
 
-export async function revokePoolContribution(diary: Diary): Promise<void> {
-  if (!diary.poolContributorKey) return;
-  await fetch("/api/research/contribute", {
-    method: "DELETE",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ contributorKey: diary.poolContributorKey }),
-  });
-}
-
 export async function syncPoolIfDue(diary: Diary): Promise<Diary> {
   if (!shouldSyncPool(diary)) return diary;
   return submitPoolContribution(diary);

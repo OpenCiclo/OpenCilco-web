@@ -213,7 +213,7 @@ export function CalendarScreen() {
         className="animate-fade-up rounded-3xl bg-card p-4 shadow-sm"
         style={{ animationDelay: "120ms" }}
       >
-        <div className="mb-3 flex flex-col gap-2 px-1 min-[480px]:flex-row min-[480px]:items-center min-[480px]:justify-between">
+        <div className="mb-3 flex flex-col gap-2 px-1">
           <h2 className="whitespace-nowrap font-serif text-lg capitalize text-card-foreground">{monthTitle}</h2>
           <div className="flex shrink-0 justify-end gap-1">
             {lunarPhasesEnabled ? (
