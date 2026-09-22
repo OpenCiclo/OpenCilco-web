@@ -117,6 +117,7 @@ export const SYMPTOM_CATALOG: SymptomMeta[] = [
   builtIn("abdominalPain", "symptoms", "symptomAbdominalPain", { noneGroup: "generalSymptoms" }),
   builtIn("vaginalItching", "symptoms", "symptomVaginalItching", { noneGroup: "generalSymptoms" }),
   builtIn("vaginalDryness", "symptoms", "symptomVaginalDryness", { noneGroup: "generalSymptoms" }),
+  builtIn("uti", "symptoms", "symptomUti", { noneGroup: "generalSymptoms" }),
   builtIn("hotFlashes", "symptoms", "symptomHotFlashes", { noneGroup: "generalSymptoms" }),
   builtIn("nightSweats", "symptoms", "symptomNightSweats", { noneGroup: "generalSymptoms" }),
   builtIn("jointPain", "symptoms", "symptomJointPain", { noneGroup: "generalSymptoms" }),

@@ -42,6 +42,7 @@ export const BUILT_IN_SYMPTOM_IDS = [
   "abdominalPain",
   "vaginalItching",
   "vaginalDryness",
+  "uti",
   "hotFlashes",
   "nightSweats",
   "jointPain",
