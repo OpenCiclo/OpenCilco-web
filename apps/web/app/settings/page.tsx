@@ -39,6 +39,8 @@ export default function SettingsPage() {
     setLunarPhasesEnabled,
     weekStartsOn,
     setWeekStartsOn,
+    colorScheme,
+    setColorScheme,
     diary,
     wallet,
     enablePoolOptIn,
@@ -160,6 +162,32 @@ export default function SettingsPage() {
               onClick={() => setWeekStartsOn(0)}
             >
               {t.weekStartsSunday}
+            </Button>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-card-foreground">{t.colorScheme}</p>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            <Button
+              type="button"
+              variant={colorScheme === "light" ? "default" : "outline"}
+              onClick={() => setColorScheme("light")}
+            >
+              {t.colorSchemeLight}
+            </Button>
+            <Button
+              type="button"
+              variant={colorScheme === "dark" ? "default" : "outline"}
+              onClick={() => setColorScheme("dark")}
+            >
+              {t.colorSchemeDark}
+            </Button>
+            <Button
+              type="button"
+              variant={colorScheme === "system" ? "default" : "outline"}
+              onClick={() => setColorScheme("system")}
+            >
+              {t.colorSchemeSystem}
             </Button>
           </div>
         </div>

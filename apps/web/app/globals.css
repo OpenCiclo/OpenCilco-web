@@ -78,6 +78,39 @@
   --radius: 0.9rem;
 }
 
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.18 0.006 260);
+  --foreground: oklch(0.95 0.005 260);
+  --card: oklch(0.22 0.006 260);
+  --card-foreground: oklch(0.95 0.005 260);
+  --popover: oklch(0.22 0.006 260);
+  --popover-foreground: oklch(0.95 0.005 260);
+  --primary: oklch(0.74 0.13 12);
+  --primary-foreground: oklch(0.99 0.008 20);
+  --secondary: oklch(0.27 0.006 260);
+  --secondary-foreground: oklch(0.92 0.005 260);
+  --muted: oklch(0.27 0.006 260);
+  --muted-foreground: oklch(0.74 0.01 260);
+  --accent: oklch(0.3 0.008 260);
+  --accent-foreground: oklch(0.95 0.005 260);
+  --destructive: oklch(0.68 0.17 22);
+  --border: oklch(0.34 0.008 260);
+  --input: oklch(0.34 0.008 260);
+  --ring: oklch(0.74 0.13 12);
+  --bleed: oklch(0.64 0.16 15);
+  --bleed-foreground: oklch(0.99 0.008 20);
+  --fertile: oklch(0.74 0.1 200);
+  --fertile-foreground: oklch(0.88 0.06 200);
+  --phase-follicular: oklch(0.34 0.04 45);
+  --phase-luteal: oklch(0.32 0.04 330);
+  --chart-1: oklch(0.74 0.13 12);
+  --chart-2: oklch(0.78 0.11 45);
+  --chart-3: oklch(0.74 0.1 200);
+  --chart-4: oklch(0.7 0.1 330);
+  --chart-5: oklch(0.82 0.08 90);
+}
+
 /* Neutral, clean marketing theme — scoped to /site and /contact only.
    The app keeps its warm rose identity; the public landing reads white,
    modern and reliable, letting the colorful cycle ring be the one accent. */
@@ -102,6 +135,28 @@
   --input: oklch(0.921 0.004 260);
   --ring: oklch(0.7 0.006 260);
   --radius: 0.9rem;
+}
+
+.dark .marketing-theme {
+  color-scheme: dark;
+  --background: oklch(0.18 0.006 260);
+  --foreground: oklch(0.95 0.005 260);
+  --card: oklch(0.22 0.006 260);
+  --card-foreground: oklch(0.95 0.005 260);
+  --popover: oklch(0.22 0.006 260);
+  --popover-foreground: oklch(0.95 0.005 260);
+  --primary: oklch(0.93 0.004 260);
+  --primary-foreground: oklch(0.18 0.006 260);
+  --secondary: oklch(0.27 0.006 260);
+  --secondary-foreground: oklch(0.92 0.005 260);
+  --muted: oklch(0.27 0.006 260);
+  --muted-foreground: oklch(0.74 0.01 260);
+  --accent: oklch(0.3 0.008 260);
+  --accent-foreground: oklch(0.95 0.005 260);
+  --destructive: oklch(0.68 0.17 22);
+  --border: oklch(0.34 0.008 260);
+  --input: oklch(0.34 0.008 260);
+  --ring: oklch(0.74 0.01 260);
 }
 
 @layer base {

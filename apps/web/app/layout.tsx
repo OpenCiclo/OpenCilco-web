@@ -5,6 +5,8 @@ import { CicloProvider } from "@/lib/client/ciclo-context";
 import { FloatingTabBar } from "@/components/floating-tab-bar";
 import { RegisterSw } from "@/components/register-sw";
 import { StandaloneHomeRedirect } from "@/components/standalone-home-redirect";
+import { ThemeClass } from "@/components/theme-class";
+import { themeBootScript } from "@/lib/client/color-scheme";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -31,19 +33,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#f7f7f8",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${fraunces.variable} ${nunito.variable} h-full antialiased`}>
+    <html lang="es" suppressHydrationWarning className={`${fraunces.variable} ${nunito.variable} h-full antialiased`}>
       <body className="min-h-full bg-background font-sans text-foreground">
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript() }} />
         <CicloProvider>
           {children}
           <FloatingTabBar />
           <StandaloneHomeRedirect />
+          <ThemeClass />
           <RegisterSw />
         </CicloProvider>
       </body>

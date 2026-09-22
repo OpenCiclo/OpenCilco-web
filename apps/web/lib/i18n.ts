@@ -41,6 +41,10 @@ const es = {
   weekStartsOn: "La semana empieza",
   weekStartsMonday: "Lunes",
   weekStartsSunday: "Domingo",
+  colorScheme: "Apariencia",
+  colorSchemeLight: "Día",
+  colorSchemeDark: "Noche",
+  colorSchemeSystem: "Sistema",
   lunarPhases: "Fases lunares",
   lunarPhasesHint:
     "Activa la función de fases lunares. En el calendario podrás mostrarlas u ocultarlas con el botón de luna.",
@@ -514,6 +518,10 @@ const en = {
   weekStartsOn: "Week starts on",
   weekStartsMonday: "Monday",
   weekStartsSunday: "Sunday",
+  colorScheme: "Appearance",
+  colorSchemeLight: "Day",
+  colorSchemeDark: "Night",
+  colorSchemeSystem: "System",
   lunarPhases: "Lunar phases",
   lunarPhasesHint:
     "Enable lunar phases. On the calendar you can show or hide them with the moon button.",
