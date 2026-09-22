@@ -2,7 +2,7 @@
 
 **OpenCiclo is an open-source, privacy-first menstrual-cycle forecasting engine. It is designed to provide useful probabilistic cycle forecasts while keeping personal health data under the user's control.**
 
-Built by Emma Flora Harbison & Luis Rey Sánchez  
+OpenCiclo  
 Copyright © 2026  
 Apache License 2.0
 
@@ -23,10 +23,12 @@ It does **not** predict ovulation, fertile windows, pregnancy, or contraception.
 
 The published prior is **mcPHASES only**. Utah/Creighton is an external check and is **not** mixed into `openciclo/artifacts/released_model.json`.
 
-| Study | Role | Link |
-| --- | --- | --- |
-| mcPHASES 1.0.0 (Canada) | Source of the released aggregate prior; model selection (LOO MAE **3.50** days, n=130) | [https://physionet.org/content/mcphases/1.0.0/](https://physionet.org/content/mcphases/1.0.0/) |
-| Utah / Creighton (1990–2013) | External walk-forward check (LOO MAE **~3.02** days, n=2557). Not used to overwrite the prior. | [https://doi.org/10.7278/S50d-4gxs-s4hj](https://doi.org/10.7278/S50d-4gxs-s4hj) |
+
+| Study                        | Role                                                                                           | Link                                                                                           |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| mcPHASES 1.0.0 (Canada)      | Source of the released aggregate prior; model selection (LOO MAE **3.50** days, n=130)         | [https://physionet.org/content/mcphases/1.0.0/](https://physionet.org/content/mcphases/1.0.0/) |
+| Utah / Creighton (1990–2013) | External walk-forward check (LOO MAE **~3.02** days, n=2557). Not used to overwrite the prior. | [https://doi.org/10.7278/S50d-4gxs-s4hj](https://doi.org/10.7278/S50d-4gxs-s4hj)               |
+
 
 These numbers describe those cohorts. They are not worldwide product accuracy.
 
@@ -103,6 +105,8 @@ Regenerate TypeScript parity vectors (does not change the released model):
 python scripts/generate_forecast_parity.py
 ```
 
+
+
 ## Benchmarks
 
 Model selection (requires a local DUA copy of mcPHASES):
@@ -125,21 +129,25 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Pull requests that change forecasting be
 
 ## Documentation
 
-| Document | Contents |
-| --- | --- |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System layers, wallet, ciphertext, research pool |
-| [PRIVACY.md](PRIVACY.md) | User-facing privacy explanation |
-| [DATASETS.md](DATASETS.md) | Dataset provenance and licenses |
-| [MODEL_CARD.md](MODEL_CARD.md) | Released timing model (mcPHASES prior; Utah external) |
-| [docs/research.md](docs/research.md) | Literature notes and citations |
-| [docs/modeling.md](docs/modeling.md) | Modeling assumptions |
-| [docs/evaluation.md](docs/evaluation.md) | Walk-forward protocol and metrics |
-| [docs/api.md](docs/api.md) | Library API |
-| [docs/threat-model.md](docs/threat-model.md) | Privacy/security threats |
-| [docs/kb/](docs/kb/README.md) | Index of product Help articles (source: `apps/web/content/help/`) |
-| [SECURITY.md](SECURITY.md) | Vulnerability reporting |
-| [apps/web/README.md](apps/web/README.md) | Vercel + Neon (primary), local Next.js, Docker |
-| [agents.txt](agents.txt) | Map for coding agents |
+
+| Document                                     | Contents                                                          |
+| -------------------------------------------- | ----------------------------------------------------------------- |
+| [ARCHITECTURE.md](ARCHITECTURE.md)           | System layers, wallet, ciphertext, research pool                  |
+| [PRIVACY.md](PRIVACY.md)                     | User-facing privacy explanation                                   |
+| [DATASETS.md](DATASETS.md)                   | Dataset provenance and licenses                                   |
+| [MODEL_CARD.md](MODEL_CARD.md)               | Released timing model (mcPHASES prior; Utah external)             |
+| [docs/research.md](docs/research.md)         | Literature notes and citations                                    |
+| [docs/modeling.md](docs/modeling.md)         | Modeling assumptions                                              |
+| [docs/evaluation.md](docs/evaluation.md)     | Walk-forward protocol and metrics                                 |
+| [docs/api.md](docs/api.md)                   | Library API                                                       |
+| [docs/threat-model.md](docs/threat-model.md) | Privacy/security threats                                          |
+| [docs/kb/](docs/kb/README.md)                | Index of product Help articles (source: `apps/web/content/help/`) |
+| [SECURITY.md](SECURITY.md)                   | Vulnerability reporting                                           |
+| [apps/web/README.md](apps/web/README.md)     | Vercel + Neon (primary), local Next.js, Docker                    |
+| [agents.txt](agents.txt)                     | Map for coding agents                                             |
+
+
+
 
 ## License
 
@@ -153,3 +161,4 @@ Commercial use, modification, self-hosting, and integration into other projects 
 - Default `predict()` loads aggregate parameters from `openciclo/artifacts/released_model.json` (mcPHASES-fitted prior; no microdata; no Utah mix-in).
 - Evaluation in this repo’s CI uses simulated cycles. Model **selection** uses local mcPHASES when the DUA file is present.
 - Forecasts are estimates with uncertainty. They are not diagnoses and not contraception.
+

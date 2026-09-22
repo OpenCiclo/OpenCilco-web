@@ -13,6 +13,7 @@ services:
       - ./apps/web/drizzle/0001_pool_upsert.sql:/docker-entrypoint-initdb.d/0001_pool_upsert.sql
       - ./apps/web/drizzle/0002_learn_articles.sql:/docker-entrypoint-initdb.d/0002_learn_articles.sql
       - ./apps/web/drizzle/0003_mailbox_pending.sql:/docker-entrypoint-initdb.d/0003_mailbox_pending.sql
+      - ./apps/web/drizzle/0004_account_activity.sql:/docker-entrypoint-initdb.d/0004_account_activity.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U openciclo -d openciclo"]
       interval: 5s

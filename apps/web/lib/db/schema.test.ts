@@ -67,4 +67,18 @@ describe("database schema", () => {
     );
     expect(init).toMatch(/REFERENCES accounts\(id\) ON DELETE CASCADE/);
   });
+
+  it("counts sign-ins by day without email or health columns", () => {
+    const activity = readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), "../../drizzle/0004_account_activity.sql"),
+      "utf8",
+    );
+    expect(activity).toContain("CREATE TABLE IF NOT EXISTS account_activity_days");
+    expect(activity).toContain("PRIMARY KEY (account_id, day)");
+    expect(activity).toContain("ON DELETE CASCADE");
+    expect(activity.toLowerCase()).not.toContain("email");
+    expect(activity.toLowerCase()).not.toContain("ciphertext");
+    expect(activity.toLowerCase()).not.toContain("cycle_lengths");
+    expect(activity.toLowerCase()).not.toContain("pubkey");
+  });
 });

@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
+  date,
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uuid,
@@ -20,6 +22,17 @@ export const accounts = pgTable("accounts", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const accountActivityDays = pgTable(
+  "account_activity_days",
+  {
+    accountId: uuid("account_id")
+      .notNull()
+      .references(() => accounts.id, { onDelete: "cascade" }),
+    day: date("day").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.accountId, table.day] })],
+);
 
 export const recoveryMailboxes = pgTable("recovery_mailboxes", {
   id: uuid("id").defaultRandom().primaryKey(),

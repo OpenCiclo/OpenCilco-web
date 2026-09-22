@@ -40,7 +40,7 @@ Cursor: also see the short AGENTS.md at the repo root. Do not edit apps/web/AGEN
 
 - Intended production: Vercel project root directory `apps/web` + Neon Postgres.
 - Env: `DATABASE_URL`, `SESSION_SECRET`, `EMAIL_LOOKUP_SECRET`, `APP_URL` (no trailing slash). Email signup needs `RESEND_API_KEY` + `MAIL_FROM` (production) or SMTP (local Mailpit). If neither is set, email signup is 503. Optional `CONSOLE_EMAILS` (comma-separated). If unset, `/console` is 404. Day-to-day email sign-in does not use inbox magic links; signup sends a 6-digit code once.
-- SQL: `apps/web/drizzle/0000_init.sql`, `0001_pool_upsert.sql`, `0002_learn_articles.sql`, `0003_mailbox_pending.sql`. No plaintext health columns. Never store plaintext email — HMAC `email_lookup` only.
+- SQL: `apps/web/drizzle/0000_init.sql`, `0001_pool_upsert.sql`, `0002_learn_articles.sql`, `0003_mailbox_pending.sql`, `0004_account_activity.sql`. No plaintext health columns. Never store plaintext email — HMAC `email_lookup` only. `0004` is one row per account per UTC day on sign-in; the console shows counts only.
 - Local UI: `cd apps/web && npm run dev` with `.env.local` from `.env.template`. You cannot see or edit `.env`.
 - Local stack: `docker compose up --build` from repo root. `APP_URL` is `http://localhost:3000`. Bind is `127.0.0.1:3000`.
 - Do not document or reintroduce Tailscale / serve tunnels. Public access is Vercel.
@@ -119,7 +119,7 @@ POST integer cycle lengths, no pubkey. Server assigns opaque pool_id. Device rem
 - Route `/console`. Not linked from marketing or the tab bar. `robots: noindex`.
 - Gate: `CONSOLE_EMAILS`. Compare HMAC(email) to `recovery_mailboxes.email_lookup` for the session account where `verified_at` is set. Never store or log plaintext operator emails in the panel.
 - Phrase-only accounts cannot match the allowlist.
-- Stats are row counts and timestamps only. Do not list `pubkey_hash`, emails, ciphertext, or `cycle_lengths`. Do not join research rows to accounts.
+- Stats are row counts and timestamps only. Sign-in writes `account_activity_days` (account id + UTC day) so the console can count unique opens. Do not list those rows, `pubkey_hash`, emails, ciphertext, or `cycle_lengths`. Do not join research rows to accounts.
 - Learn CMS writes `learn_articles`. Deleting a DB row restores the shipped article if that slug exists in `LEARN_ARTICLES`.
 
 ## What not to build here

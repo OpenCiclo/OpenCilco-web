@@ -1,12 +1,12 @@
 // Copyright © 2026 Emma Flora Harbison & Luis Rey Sánchez
 // SPDX-License-Identifier: Apache-2.0
 
-import { and, count, gt, ne } from "drizzle-orm";
+import { and, count, gte, gt, lt, ne, sql } from "drizzle-orm";
 
 import { LEARN_ARTICLES } from "@/lib/learn/articles";
 import { mergeLearnCatalog } from "@/lib/learn/catalog";
 import { loadDbLearnEntries } from "@/lib/learn/load";
-import { accounts, recoveryMailboxes, researchContributions } from "@/lib/db/schema";
+import { accountActivityDays, accounts, recoveryMailboxes, researchContributions } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
 
 export type ConsoleDayCount = {
@@ -18,7 +18,13 @@ export type ConsoleStats = {
   accountsTotal: number;
   accountsNew7d: number;
   accountsNew30d: number;
+  signupsToday: number;
+  signupsYesterday: number;
   accountsByDay: ConsoleDayCount[];
+  activeToday: number;
+  active7d: number;
+  active30d: number;
+  activeByDay: ConsoleDayCount[];
   emailAccounts: number;
   phraseOnlyAccounts: number;
   hostedDiaries: number;
@@ -49,16 +55,71 @@ function fillDayCounts(rows: { day: string; count: number }[], spanDays: number)
   return result;
 }
 
+function startOfUtcDay(offsetDays = 0): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - offsetDays));
+}
+
+async function loadActivity(spanDays: number): Promise<{
+  activeToday: number;
+  active7d: number;
+  active30d: number;
+  activeByDay: ConsoleDayCount[];
+}> {
+  const empty = {
+    activeToday: 0,
+    active7d: 0,
+    active30d: 0,
+    activeByDay: fillDayCounts([], spanDays),
+  };
+  try {
+    const db = getDb();
+    const today = utcDay(new Date());
+    const day7 = utcDay(daysAgo(6));
+    const day30 = utcDay(daysAgo(29));
+    const day28 = utcDay(daysAgo(spanDays - 1));
+    const distinct = sql<number>`count(distinct ${accountActivityDays.accountId})::int`;
+    const [todayRows, weekRows, monthRows, byDay] = await Promise.all([
+      db.select({ n: count() }).from(accountActivityDays).where(gte(accountActivityDays.day, today)),
+      db.select({ n: distinct }).from(accountActivityDays).where(gte(accountActivityDays.day, day7)),
+      db.select({ n: distinct }).from(accountActivityDays).where(gte(accountActivityDays.day, day30)),
+      db
+        .select({
+          day: accountActivityDays.day,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(accountActivityDays)
+        .where(gte(accountActivityDays.day, day28))
+        .groupBy(accountActivityDays.day),
+    ]);
+    return {
+      activeToday: Number(todayRows[0]?.n ?? 0),
+      active7d: Number(weekRows[0]?.n ?? 0),
+      active30d: Number(monthRows[0]?.n ?? 0),
+      activeByDay: fillDayCounts(
+        byDay.map((row) => ({ day: String(row.day), count: Number(row.count) })),
+        spanDays,
+      ),
+    };
+  } catch {
+    return empty;
+  }
+}
+
 export async function loadConsoleStats(): Promise<ConsoleStats> {
   const db = getDb();
   const since7 = daysAgo(7);
   const since30 = daysAgo(30);
   const since28 = daysAgo(27);
+  const todayStart = startOfUtcDay(0);
+  const yesterdayStart = startOfUtcDay(1);
 
   const [
     totalRows,
     new7Rows,
     new30Rows,
+    todayRows,
+    yesterdayRows,
     emailRows,
     hostedRows,
     saved7Rows,
@@ -66,10 +127,16 @@ export async function loadConsoleStats(): Promise<ConsoleStats> {
     researchTotalRows,
     researchNewRows,
     recentSignups,
+    activity,
   ] = await Promise.all([
     db.select({ n: count() }).from(accounts),
     db.select({ n: count() }).from(accounts).where(gt(accounts.createdAt, since7)),
     db.select({ n: count() }).from(accounts).where(gt(accounts.createdAt, since30)),
+    db.select({ n: count() }).from(accounts).where(gte(accounts.createdAt, todayStart)),
+    db
+      .select({ n: count() })
+      .from(accounts)
+      .where(and(gte(accounts.createdAt, yesterdayStart), lt(accounts.createdAt, todayStart))),
     db.select({ n: count() }).from(recoveryMailboxes),
     db.select({ n: count() }).from(accounts).where(ne(accounts.ciphertext, "")),
     db
@@ -83,6 +150,7 @@ export async function loadConsoleStats(): Promise<ConsoleStats> {
     db.select({ n: count() }).from(researchContributions),
     db.select({ n: count() }).from(researchContributions).where(gt(researchContributions.createdAt, since30)),
     db.select({ createdAt: accounts.createdAt }).from(accounts).where(gt(accounts.createdAt, since28)),
+    loadActivity(28),
   ]);
 
   const signupCounts = new Map<string, number>();
@@ -102,10 +170,16 @@ export async function loadConsoleStats(): Promise<ConsoleStats> {
     accountsTotal,
     accountsNew7d: Number(new7Rows[0]?.n ?? 0),
     accountsNew30d: Number(new30Rows[0]?.n ?? 0),
+    signupsToday: Number(todayRows[0]?.n ?? 0),
+    signupsYesterday: Number(yesterdayRows[0]?.n ?? 0),
     accountsByDay: fillDayCounts(
       [...signupCounts.entries()].map(([day, count]) => ({ day, count })),
       28,
     ),
+    activeToday: activity.activeToday,
+    active7d: activity.active7d,
+    active30d: activity.active30d,
+    activeByDay: activity.activeByDay,
     emailAccounts,
     phraseOnlyAccounts: Math.max(0, accountsTotal - emailAccounts),
     hostedDiaries: Number(hostedRows[0]?.n ?? 0),

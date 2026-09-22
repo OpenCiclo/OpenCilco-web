@@ -8,6 +8,7 @@ import { accounts, authChallenges } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";
 import { jsonError } from "@/lib/server/env";
 import { setSessionCookie } from "@/lib/server/session";
+import { recordAccountOpen } from "@/lib/server/account-activity";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as {
@@ -73,5 +74,6 @@ export async function POST(request: Request) {
     created = true;
   }
   await setSessionCookie(pubkeyHash, body.persist !== false);
+  await recordAccountOpen(pubkeyHash);
   return Response.json({ ok: true, created });
 }

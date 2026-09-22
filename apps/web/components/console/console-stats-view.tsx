@@ -11,9 +11,13 @@ import { Card } from "@/components/ui/card";
 export function ConsoleStatsView({ stats }: { stats: ConsoleStats }) {
   const { locale } = useCiclo();
   const copy = consoleCopy(locale);
-  const maxDay = Math.max(1, ...stats.accountsByDay.map((row) => row.count));
 
   const cards = [
+    { label: copy.signupsToday, value: stats.signupsToday },
+    { label: copy.signupsYesterday, value: stats.signupsYesterday },
+    { label: copy.activeToday, value: stats.activeToday },
+    { label: copy.active7d, value: stats.active7d },
+    { label: copy.active30d, value: stats.active30d },
     { label: copy.accountsTotal, value: stats.accountsTotal },
     { label: copy.accountsNew7d, value: stats.accountsNew7d },
     { label: copy.accountsNew30d, value: stats.accountsNew30d },
@@ -43,18 +47,30 @@ export function ConsoleStatsView({ stats }: { stats: ConsoleStats }) {
           </Card>
         ))}
       </div>
-      <div>
-        <h2 className="text-sm font-semibold">{copy.signups28d}</h2>
-        <div className="mt-3 flex h-32 items-end gap-1">
-          {stats.accountsByDay.map((row) => (
-            <div
-              key={row.day}
-              title={`${row.day}: ${row.count}`}
-              className="flex-1 rounded-t bg-primary/80"
-              style={{ height: `${Math.max(6, (row.count / maxDay) * 100)}%` }}
-            />
-          ))}
-        </div>
+      <DayChart title={copy.signups28d} rows={stats.accountsByDay} />
+      <DayChart title={copy.active28d} rows={stats.activeByDay} />
+    </div>
+  );
+}
+
+function DayChart({ title, rows }: { title: string; rows: ConsoleStats["accountsByDay"] }) {
+  const maxDay = Math.max(1, ...rows.map((row) => row.count));
+  return (
+    <div>
+      <h2 className="text-sm font-semibold">{title}</h2>
+      <div className="mt-3 flex h-32 items-end gap-1">
+        {rows.map((row) => (
+          <div
+            key={row.day}
+            title={`${row.day}: ${row.count}`}
+            className="flex-1 rounded-t bg-primary/80"
+            style={{ height: `${Math.max(6, (row.count / maxDay) * 100)}%` }}
+          />
+        ))}
+      </div>
+      <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
+        <span>{rows[0]?.day}</span>
+        <span>{rows[rows.length - 1]?.day}</span>
       </div>
     </div>
   );

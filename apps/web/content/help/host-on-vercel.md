@@ -20,8 +20,9 @@ On that database, run the SQL in:
 - `apps/web/drizzle/0001_pool_upsert.sql`
 - `apps/web/drizzle/0002_learn_articles.sql`
 - `apps/web/drizzle/0003_mailbox_pending.sql`
+- `apps/web/drizzle/0004_account_activity.sql`
 
-Those files create accounts, ciphertext columns, sessions, the anonymous research pool, Learn CMS rows, and email confirmation pending. They do not create health columns. `0003` adds `verified_at` on existing mailboxes (set to `created_at`) so current accounts keep working.
+Those files create accounts, ciphertext columns, sessions, the anonymous research pool, Learn CMS rows, and email confirmation pending. They do not create health columns. `0003` adds `verified_at` on existing mailboxes (set to `created_at`) so current accounts keep working. `0004` records one sign-in per account per UTC day so the console can count unique opens. It does not store email or diary contents.
 
 ## 3. Environment variables
 
