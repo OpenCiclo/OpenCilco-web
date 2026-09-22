@@ -10,6 +10,7 @@ import { storeBrowserPassword } from "@/lib/client/credentials";
 import { diaryToCsv, diaryToJson, mergeDiaries, parseImportedFile, previewImport } from "@/lib/diary-io";
 import { otherLocale } from "@/lib/i18n";
 import { AppShell } from "@/components/app-shell";
+import { InstallPrompt } from "@/components/install-prompt";
 import { PhraseQrCode } from "@/components/phrase-qr-code";
 import { SavePhraseForm } from "@/components/save-phrase-form";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,8 @@ export default function SettingsPage() {
     setVisualSeasons,
     lunarPhasesEnabled,
     setLunarPhasesEnabled,
+    weekStartsOn,
+    setWeekStartsOn,
     diary,
     wallet,
     enablePoolOptIn,
@@ -141,6 +144,25 @@ export default function SettingsPage() {
             className="h-7 w-12 shrink-0 cursor-pointer appearance-none rounded-full bg-muted-foreground/30 p-1 transition-colors before:block before:size-5 before:rounded-full before:bg-white before:shadow-sm before:transition-transform checked:bg-primary checked:before:translate-x-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           />
         </label>
+        <div>
+          <p className="text-sm font-semibold text-card-foreground">{t.weekStartsOn}</p>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant={weekStartsOn === 1 ? "default" : "outline"}
+              onClick={() => setWeekStartsOn(1)}
+            >
+              {t.weekStartsMonday}
+            </Button>
+            <Button
+              type="button"
+              variant={weekStartsOn === 0 ? "default" : "outline"}
+              onClick={() => setWeekStartsOn(0)}
+            >
+              {t.weekStartsSunday}
+            </Button>
+          </div>
+        </div>
         <Link href="/privacy" className="text-sm font-medium text-primary underline">
           {t.privacy}
         </Link>
@@ -151,6 +173,7 @@ export default function SettingsPage() {
           {t.address}: {wallet.pubkeyHash}
         </p>
       </Card>
+      <InstallPrompt mode="settings" />
       <Card className="mt-4 rounded-3xl border-primary/20 bg-primary/5 p-4 text-sm leading-6 text-muted-foreground">
         {t.noResetHint}
       </Card>

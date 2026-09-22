@@ -30,11 +30,13 @@ import {
   LUNAR_PHASES_ENABLED_KEY,
   LUNAR_PHASES_VISIBLE_KEY,
   VISUAL_SEASONS_KEY,
+  WEEK_STARTS_ON_KEY,
   clearStoredMnemonic,
   migrateBrowserStorage,
   parseLunarPhasesEnabled,
   parseLunarPhasesVisible,
   parseVisualSeasons,
+  parseWeekStartsOn,
   readUnlockState,
   writeStoredMnemonic,
 } from "@/lib/client/storage-migrate";
@@ -53,12 +55,14 @@ type CicloContextValue = {
   visualSeasons: boolean;
   lunarPhasesEnabled: boolean;
   lunarPhasesVisible: boolean;
+  weekStartsOn: 0 | 1;
   t: (typeof messages)["es"];
   error: string | null;
   setLocale: (locale: Locale) => void;
   setVisualSeasons: (enabled: boolean) => void;
   setLunarPhasesEnabled: (enabled: boolean) => void;
   setLunarPhasesVisible: (visible: boolean) => void;
+  setWeekStartsOn: (weekStartsOn: 0 | 1) => void;
   startOnboarding: () => Wallet;
   unlock: (mnemonic: string, options?: UnlockOptions) => Promise<void>;
   createEmailAccount: (email: string, password: string, options?: PersistOptions) => Promise<void>;
@@ -116,6 +120,7 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
   const [visualSeasons, setVisualSeasonsState] = useState(false);
   const [lunarPhasesEnabled, setLunarPhasesEnabledState] = useState(true);
   const [lunarPhasesVisible, setLunarPhasesVisibleState] = useState(false);
+  const [weekStartsOn, setWeekStartsOnState] = useState<0 | 1>(1);
   const [error, setError] = useState<string | null>(null);
   const [pendingSignup, setPendingSignup] = useState<PendingEmailSignup | null>(null);
 
@@ -156,6 +161,7 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
         setLunarPhasesVisibleState(
           parseLunarPhasesVisible(localStorage.getItem(LUNAR_PHASES_VISIBLE_KEY)),
         );
+        setWeekStartsOnState(parseWeekStartsOn(localStorage.getItem(WEEK_STARTS_ON_KEY)));
         if (!unlockState.mnemonic) {
           setDiary(emptyDiary(storedLocale));
           return;
@@ -221,6 +227,7 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
       visualSeasons,
       lunarPhasesEnabled,
       lunarPhasesVisible,
+      weekStartsOn,
       t,
       error,
       setError,
@@ -243,6 +250,10 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
       setLunarPhasesVisible: (visible) => {
         localStorage.setItem(LUNAR_PHASES_VISIBLE_KEY, String(visible));
         setLunarPhasesVisibleState(visible);
+      },
+      setWeekStartsOn: (next) => {
+        localStorage.setItem(WEEK_STARTS_ON_KEY, String(next));
+        setWeekStartsOnState(next);
       },
       startOnboarding: () => createWallet(),
       unlock,
@@ -355,6 +366,7 @@ export function CicloProvider({ children }: { children: React.ReactNode }) {
       locale,
       lunarPhasesEnabled,
       lunarPhasesVisible,
+      weekStartsOn,
       pendingSignup,
       persistDiary,
       ready,

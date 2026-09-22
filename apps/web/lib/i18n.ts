@@ -38,6 +38,9 @@ const es = {
   visualSeasons: "Estaciones visuales",
   visualSeasonsHint:
     "Ambientar la tarjeta del ciclo según su estación: invierno, primavera, verano u otoño. Las animaciones respetan la preferencia de movimiento reducido del dispositivo.",
+  weekStartsOn: "La semana empieza",
+  weekStartsMonday: "Lunes",
+  weekStartsSunday: "Domingo",
   lunarPhases: "Fases lunares",
   lunarPhasesHint:
     "Activa la función de fases lunares. En el calendario podrás mostrarlas u ocultarlas con el botón de luna.",
@@ -508,6 +511,9 @@ const en = {
   visualSeasons: "Visual seasons",
   visualSeasonsHint:
     "Theme the cycle card for its season: winter, spring, summer, or fall. Animations respect your device's reduced-motion preference.",
+  weekStartsOn: "Week starts on",
+  weekStartsMonday: "Monday",
+  weekStartsSunday: "Sunday",
   lunarPhases: "Lunar phases",
   lunarPhasesHint:
     "Enable lunar phases. On the calendar you can show or hide them with the moon button.",

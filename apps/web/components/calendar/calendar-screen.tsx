@@ -37,6 +37,7 @@ import { CycleStatusCard } from "@/components/calendar/cycle-status-card";
 import { DaySheet } from "@/components/calendar/day-sheet";
 import { MoonPhaseIcon } from "@/components/calendar/moon-phase-icon";
 import { SymptomFilterSheet } from "@/components/calendar/symptom-filter-sheet";
+import { InstallPrompt } from "@/components/install-prompt";
 
 const MOON_PHASE_LABEL_KEYS: Record<MoonPhaseId, keyof Messages> = {
   newMoon: "moonPhaseNewMoon",
@@ -67,6 +68,7 @@ export function CalendarScreen() {
     lunarPhasesEnabled,
     lunarPhasesVisible,
     setLunarPhasesVisible,
+    weekStartsOn,
   } = useCiclo();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -103,7 +105,6 @@ export function CalendarScreen() {
   );
   const mostLikelyStart = overview.forecast?.mostLikelyDate ?? null;
   const filtersActive = activeFilters.length > 0;
-  const weekStartsOn = locale === "es" ? 1 : 0;
   const cells = monthCells(year, month, weekStartsOn);
   const labels = weekdayLabels(locale, weekStartsOn);
   const monthTitle = formatIsoUtc(new Date(Date.UTC(year, month - 1, 1)).toISOString().slice(0, 10), locale, {
@@ -197,6 +198,8 @@ export function CalendarScreen() {
       <header className="animate-fade-up">
         <p className="text-sm font-medium text-muted-foreground capitalize">{greetingDate}</p>
       </header>
+
+      <InstallPrompt mode="calendar" />
 
       <CycleStatusCard
         overview={overview}

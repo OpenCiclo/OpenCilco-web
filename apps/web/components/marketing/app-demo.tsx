@@ -41,6 +41,7 @@ import {
 } from "@/lib/diary";
 import { formatIsoUtc } from "@/lib/format-date";
 import { messages, type Locale } from "@/lib/i18n";
+import { useCiclo } from "@/lib/client/ciclo-context";
 import { LEARN_ARTICLES, articleCopy, type LearnCategory } from "@/lib/learn/articles";
 import { lunarDayInfo } from "@/lib/lunar/phases";
 import { patternStats } from "@/lib/patterns/stats";
@@ -120,6 +121,7 @@ type Tab = "calendar" | "patterns" | "learn" | "settings";
 
 export function AppDemo({ locale }: { locale: Locale }) {
   const t = messages[locale];
+  const { weekStartsOn } = useCiclo();
   const today = useMemo(() => todayIsoUtc(), []);
   const sample = useMemo(() => buildSampleDiary(locale, today), [locale, today]);
   const [overrides, setOverrides] = useState<Record<string, DayLog>>({});
@@ -147,7 +149,6 @@ export function AppDemo({ locale }: { locale: Locale }) {
   const todayDate = new Date(`${today}T00:00:00Z`);
   const year = todayDate.getUTCFullYear();
   const month = todayDate.getUTCMonth() + 1;
-  const weekStartsOn = locale === "es" ? 1 : 0;
   const cells = monthCells(year, month, weekStartsOn);
   const labels = weekdayLabels(locale, weekStartsOn);
   const monthTitle = formatIsoUtc(`${year}-${String(month).padStart(2, "0")}-01`, locale, {

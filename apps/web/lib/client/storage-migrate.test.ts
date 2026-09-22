@@ -10,6 +10,7 @@ import {
   parseLunarPhasesEnabled,
   parseLunarPhasesVisible,
   parseVisualSeasons,
+  parseWeekStartsOn,
   readUnlockState,
   writeStoredMnemonic,
 } from "./storage-migrate";
@@ -57,6 +58,15 @@ describe("lunar phase preferences", () => {
     expect(parseLunarPhasesVisible(null)).toBe(false);
     expect(parseLunarPhasesVisible("false")).toBe(false);
     expect(parseLunarPhasesVisible("true")).toBe(true);
+  });
+});
+
+describe("week start preference", () => {
+  it("defaults to Monday and accepts Sunday", () => {
+    expect(parseWeekStartsOn(null)).toBe(1);
+    expect(parseWeekStartsOn("1")).toBe(1);
+    expect(parseWeekStartsOn("0")).toBe(0);
+    expect(parseWeekStartsOn("nope")).toBe(1);
   });
 });
 

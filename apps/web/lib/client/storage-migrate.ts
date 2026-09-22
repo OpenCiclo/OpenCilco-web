@@ -14,6 +14,7 @@ export const LOCALE_KEY = "ciclo.locale";
 export const VISUAL_SEASONS_KEY = "ciclo.visualSeasons";
 export const LUNAR_PHASES_ENABLED_KEY = "ciclo.lunarPhasesEnabled";
 export const LUNAR_PHASES_VISIBLE_KEY = "ciclo.lunarPhasesVisible";
+export const WEEK_STARTS_ON_KEY = "ciclo.weekStartsOn";
 
 function hasBrowserStorage() {
   return typeof localStorage !== "undefined" && typeof sessionStorage !== "undefined";
@@ -70,6 +71,11 @@ export function parseLunarPhasesEnabled(value: string | null): boolean {
 /** Calendar moon band visibility. Defaults to hidden when unset. */
 export function parseLunarPhasesVisible(value: string | null): boolean {
   return value === "true";
+}
+
+/** 0 = Sunday, 1 = Monday. Defaults to Monday when unset. */
+export function parseWeekStartsOn(value: string | null): 0 | 1 {
+  return value === "0" ? 0 : 1;
 }
 
 export function migrateBrowserStorage(): void {

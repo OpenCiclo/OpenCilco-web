@@ -9,18 +9,24 @@ import {
   type InstallPlatform,
 } from "@/lib/client/install-platform";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-const DISMISS_KEY = "ciclo.installHintUntil";
-const DISMISS_MS = 30 * 24 * 60 * 60 * 1000;
+const NUDGE_KEY = "ciclo.installHintUntil";
+const CALENDAR_KEY = "ciclo.installCalendarDismissed";
+const NUDGE_MS = 30 * 24 * 60 * 60 * 1000;
+
+type InstallPromptMode = "nudge" | "calendar" | "settings";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-function readDismissed(): boolean {
+function readDismissed(mode: InstallPromptMode): boolean {
   try {
-    const until = Number(localStorage.getItem(DISMISS_KEY) ?? "0");
+    if (mode === "settings") return false;
+    if (mode === "calendar") return localStorage.getItem(CALENDAR_KEY) === "1";
+    const until = Number(localStorage.getItem(NUDGE_KEY) ?? "0");
     return Number.isFinite(until) && until > Date.now();
   } catch {
     return false;
@@ -36,13 +42,13 @@ function installedNow(): boolean {
   });
 }
 
-export function InstallPrompt() {
+export function InstallPrompt({ mode = "nudge" }: { mode?: InstallPromptMode }) {
   const { t } = useCiclo();
   const [platform, setPlatform] = useState<InstallPlatform | null>(null);
   const [promptEvent, setPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
-    if (installedNow() || readDismissed()) return;
+    if (installedNow() || readDismissed(mode)) return;
     const detected = detectInstallPlatform(navigator.userAgent, {
       maxTouchPoints: navigator.maxTouchPoints,
     });
@@ -55,7 +61,7 @@ export function InstallPrompt() {
     }
     window.addEventListener("beforeinstallprompt", onPrompt);
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);
-  }, []);
+  }, [mode]);
 
   if (!platform) return null;
 
@@ -73,7 +79,8 @@ export function InstallPrompt() {
   }[platform];
 
   function dismiss() {
-    localStorage.setItem(DISMISS_KEY, String(Date.now() + DISMISS_MS));
+    if (mode === "calendar") localStorage.setItem(CALENDAR_KEY, "1");
+    else if (mode === "nudge") localStorage.setItem(NUDGE_KEY, String(Date.now() + NUDGE_MS));
     setPlatform(null);
   }
 
@@ -86,19 +93,29 @@ export function InstallPrompt() {
   }
 
   return (
-    <aside className="w-full max-w-md rounded-2xl border border-border bg-card p-4 text-sm text-card-foreground shadow-sm">
+    <aside
+      className={cn(
+        "w-full border border-border bg-card p-4 text-sm text-card-foreground shadow-sm",
+        mode === "nudge" ? "max-w-md rounded-2xl" : "rounded-3xl",
+        mode === "settings" && "mt-4",
+      )}
+    >
       <p className="font-medium">{t.installTitle}</p>
       <p className="mt-1 leading-6 text-muted-foreground">{body}</p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {promptEvent ? (
-          <Button type="button" onClick={() => void install()}>
-            {t.installAction}
-          </Button>
-        ) : null}
-        <Button type="button" variant="outline" onClick={dismiss}>
-          {t.installDismiss}
-        </Button>
-      </div>
+      {promptEvent || mode !== "settings" ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {promptEvent ? (
+            <Button type="button" onClick={() => void install()}>
+              {t.installAction}
+            </Button>
+          ) : null}
+          {mode !== "settings" ? (
+            <Button type="button" variant="outline" onClick={dismiss}>
+              {t.installDismiss}
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
     </aside>
   );
 }
