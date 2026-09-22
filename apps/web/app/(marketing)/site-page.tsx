@@ -26,6 +26,7 @@ import { Reveal } from "@/components/marketing/reveal";
 import { AppDemo } from "@/components/marketing/app-demo";
 import { GithubMark } from "@/components/marketing/github-mark";
 import { TypewriterTitle } from "@/components/marketing/typewriter-title";
+import { InstallPrompt } from "@/components/install-prompt";
 
 type IconComponent = (props: { className?: string }) => React.ReactNode;
 
@@ -95,6 +96,7 @@ export function SitePage({ featured }: { featured: LearnArticle[] }) {
             <p className="inline-flex items-center justify-center gap-2 rounded-full bg-muted px-3 py-1.5 text-center text-xs font-medium text-muted-foreground">
               {copy.hero.disclaimer}
             </p>
+            <InstallPrompt />
           </div>
 
                 <div className="flex w-full justify-center lg:justify-end lg:pb-0 lg:[margin-bottom:-2.5rem]">

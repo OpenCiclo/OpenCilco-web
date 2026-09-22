@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { useCiclo } from "@/lib/client/ciclo-context";
 import { BrandMark } from "@/components/brand-mark";
+import { InstallPrompt } from "@/components/install-prompt";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { otherLocale } from "@/lib/i18n";
@@ -50,6 +51,7 @@ export function WelcomeScreen() {
           {t.haveAccount}
         </Button>
       </Card>
+      <InstallPrompt />
     </div>
   );
 }

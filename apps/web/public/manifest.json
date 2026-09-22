@@ -2,7 +2,9 @@
   "name": "Ciclo",
   "short_name": "Ciclo",
   "description": "Privacy-first cycle forecasts. Not a medical device or contraceptive method.",
-  "start_url": "/",
+  "id": "/",
+  "start_url": "/app",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f7f7f8",
   "theme_color": "#24272a",
@@ -18,6 +20,18 @@
       "src": "/apple-icon",
       "type": "image/png",
       "sizes": "180x180",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon/192",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon/512",
+      "type": "image/png",
+      "sizes": "512x512",
       "purpose": "any"
     }
   ]

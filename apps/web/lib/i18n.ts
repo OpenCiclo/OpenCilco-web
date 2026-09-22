@@ -198,6 +198,29 @@ const es = {
   wordMismatch: "Esa palabra no coincide.",
   privacyTitle: "Privacidad",
   welcomeCta: "Empieza en el navegador. Las fechas se cifran antes de salir del dispositivo.",
+  installTitle: "Añádela a la pantalla de inicio",
+  installDismiss: "Ahora no",
+  installAction: "Instalar",
+  installIosSafari:
+    "En Safari, pulsa Compartir y luego Añadir a pantalla de inicio. Al abrir el icono entras en la app.",
+  installIosChrome:
+    "Chrome en el iPhone no puede instalarla. Ábrela en Safari, pulsa Compartir y luego Añadir a pantalla de inicio.",
+  installIosFirefox:
+    "Firefox en el iPhone no puede instalarla. Ábrela en Safari, pulsa Compartir y luego Añadir a pantalla de inicio.",
+  installIosEdge:
+    "Edge en el iPhone no puede instalarla. Ábrela en Safari, pulsa Compartir y luego Añadir a pantalla de inicio.",
+  installIosOther:
+    "En el iPhone solo Safari puede añadirla a la pantalla de inicio. Ábrela allí, pulsa Compartir y luego Añadir a pantalla de inicio.",
+  installAndroidChrome:
+    "En Chrome, pulsa Instalar. Si no aparece, abre el menú y elige Instalar app o Añadir a pantalla de inicio.",
+  installAndroidSamsung:
+    "En Samsung Internet, abre el menú, elige Añadir página a y luego Pantalla de inicio.",
+  installAndroidFirefox:
+    "En Firefox, abre el menú y elige Instalar o Añadir a pantalla de inicio.",
+  installAndroidEdge:
+    "En Edge, abre el menú y elige Añadir a pantalla de inicio o Instalar aplicación.",
+  installAndroidOther:
+    "Abre el menú del navegador y busca Añadir a pantalla de inicio o Instalar app.",
   createWallet: "Generar frase",
   calendar: "Calendario",
   patterns: "Patrones",
@@ -645,6 +668,26 @@ const en = {
   wordMismatch: "That word does not match.",
   privacyTitle: "Privacy",
   welcomeCta: "Start in the browser. Dates are encrypted before they leave the device.",
+  installTitle: "Add it to your home screen",
+  installDismiss: "Not now",
+  installAction: "Install",
+  installIosSafari:
+    "In Safari, tap Share, then Add to Home Screen. Opening the icon takes you into the app.",
+  installIosChrome:
+    "Chrome on iPhone cannot install it. Open it in Safari, tap Share, then Add to Home Screen.",
+  installIosFirefox:
+    "Firefox on iPhone cannot install it. Open it in Safari, tap Share, then Add to Home Screen.",
+  installIosEdge:
+    "Edge on iPhone cannot install it. Open it in Safari, tap Share, then Add to Home Screen.",
+  installIosOther:
+    "On iPhone only Safari can add it to the home screen. Open it there, tap Share, then Add to Home Screen.",
+  installAndroidChrome:
+    "In Chrome, tap Install. If it does not appear, open the menu and choose Install app or Add to Home screen.",
+  installAndroidSamsung:
+    "In Samsung Internet, open the menu, choose Add page to, then Home screen.",
+  installAndroidFirefox: "In Firefox, open the menu and choose Install or Add to Home screen.",
+  installAndroidEdge: "In Edge, open the menu and choose Add to Home screen or Install app.",
+  installAndroidOther: "Open the browser menu and look for Add to Home screen or Install app.",
   createWallet: "Generate phrase",
   calendar: "Calendar",
   patterns: "Patterns",

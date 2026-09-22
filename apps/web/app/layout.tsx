@@ -4,6 +4,7 @@ import { Fraunces, Nunito } from "next/font/google";
 import { CicloProvider } from "@/lib/client/ciclo-context";
 import { FloatingTabBar } from "@/components/floating-tab-bar";
 import { RegisterSw } from "@/components/register-sw";
+import { StandaloneHomeRedirect } from "@/components/standalone-home-redirect";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CicloProvider>
           {children}
           <FloatingTabBar />
+          <StandaloneHomeRedirect />
           <RegisterSw />
         </CicloProvider>
       </body>
