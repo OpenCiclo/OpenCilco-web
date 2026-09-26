@@ -154,6 +154,7 @@ const es = {
   today: "Hoy",
   clearDay: "Quitar registro",
   nextStart: "Próximo inicio más probable",
+  expectedToStart: "Tendría que haber empezado",
   cycleLength: "Duración de ciclo",
   days: "días",
   uncertainty: "Incertidumbre",
@@ -172,6 +173,8 @@ const es = {
   forecastChart: "Probabilidad por día",
   forecastChartHint:
     "La altura es la probabilidad de que el periodo empiece ese día. La barra destacada es la fecha más probable.",
+  forecastChartHintInitial:
+    "Estas barras son el cálculo inicial. La barra destacada es el día que tenía más probabilidad.",
   priorNote: "Con poca historia, el pronóstico se acerca a un prior de población (mcPHASES, Canadá).",
   exportJson: "Exportar JSON",
   exportCsv: "Exportar CSV",
@@ -444,6 +447,7 @@ const es = {
   periodLengthRange: "Rango de sangrado",
   currentCycleDayLabel: "Día actual del ciclo",
   untilNextPeriod: "Hasta el siguiente periodo",
+  periodLateStat: "De retraso",
   cycleLengthOverTime: "Duración del ciclo",
   lastCompletedCycles: "Tus últimos {n} ciclos completos",
   recurringSymptoms: "Síntomas recurrentes",
@@ -644,6 +648,7 @@ const en = {
   today: "Today",
   clearDay: "Clear log",
   nextStart: "Most likely next start",
+  expectedToStart: "It was expected to start",
   cycleLength: "Cycle length",
   days: "days",
   uncertainty: "Uncertainty",
@@ -662,6 +667,8 @@ const en = {
   forecastChart: "Probability by day",
   forecastChartHint:
     "Bar height is the chance the period starts that day. The highlighted bar is the most likely date.",
+  forecastChartHintInitial:
+    "These bars are the initial calculation. The highlighted bar is the day that had the highest chance.",
   priorNote: "With little history, the forecast shrinks toward a population prior (mcPHASES, Canada).",
   exportJson: "Export JSON",
   exportCsv: "Export CSV",
@@ -931,6 +938,7 @@ const en = {
   periodLengthRange: "Bleeding range",
   currentCycleDayLabel: "Current cycle day",
   untilNextPeriod: "Until next period",
+  periodLateStat: "Days late",
   cycleLengthOverTime: "Cycle length over time",
   lastCompletedCycles: "Your last {n} completed cycles",
   recurringSymptoms: "Recurring symptoms",

@@ -16,6 +16,7 @@ import { buildTipContext } from "@/lib/tips/context";
 import { selectTips } from "@/lib/tips/rules";
 import { similarJournalEntries, listJournalEntries, type JournalEntry } from "@/lib/journal/entries";
 import { phaseLabel } from "@/lib/cycle/phases";
+import { nextPeriodStat } from "@/lib/cycle/period-timing";
 import { AppShell } from "@/components/app-shell";
 import { ForecastCard } from "@/components/forecast-card";
 import { NoteViewer } from "@/components/journal/note-viewer";
@@ -51,6 +52,7 @@ export default function PatternsPage() {
   );
   const history = stats.completedCycles;
   const maxLen = Math.max(35, ...history.map((cycle) => cycle.length));
+  const periodStat = nextPeriodStat(stats.nextPeriodInDays, t);
 
   const closeViewer = useCallback(() => {
     if (!activeEntry || closing) return;
@@ -114,9 +116,9 @@ export default function PatternsPage() {
             />
             {stats.forecastingEnabled ? (
               <StatTile
-                value={stats.nextPeriodInDays ?? "—"}
+                value={periodStat.value}
                 unit={t.days}
-                label={t.untilNextPeriod}
+                label={periodStat.label}
                 icon={<CalendarDays className="size-4" />}
                 tone="accent"
               />

@@ -23,6 +23,9 @@ export function ForecastChart({
   t,
   tone = "default",
   compact = false,
+  windowStart,
+  windowEnd,
+  hint,
 }: {
   daily: DailyProbability[];
   mostLikelyDate: string;
@@ -32,12 +35,16 @@ export function ForecastChart({
   t: Messages;
   tone?: "default" | "onPrimary";
   compact?: boolean;
+  windowStart?: string;
+  windowEnd?: string;
+  hint?: string;
 }) {
   const [hovered, setHovered] = useState<DailyProbability | null>(null);
   const onPrimary = tone === "onPrimary";
 
-  const end = addDays(referenceDate, DAY_COUNT - 1);
-  const points = daily.filter((item) => item.date >= referenceDate && item.date <= end).slice(0, DAY_COUNT);
+  const start = windowStart ?? referenceDate;
+  const end = windowEnd ?? addDays(referenceDate, DAY_COUNT - 1);
+  const points = daily.filter((item) => item.date >= start && item.date <= end).slice(0, DAY_COUNT);
   const longFormatter = useMemo(
     () =>
       new Intl.DateTimeFormat(locale === "es" ? "es" : "en", {
@@ -64,7 +71,7 @@ export function ForecastChart({
         <>
           <p className="text-sm font-medium">{t.forecastChart}</p>
           <p className={cn("mt-1 text-xs", onPrimary ? "text-primary-foreground/75" : "text-muted-foreground")}>
-            {t.forecastChartHint}
+            {hint ?? t.forecastChartHint}
           </p>
         </>
       )}

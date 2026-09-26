@@ -17,6 +17,15 @@ export function periodTimingChip(days: number | null, observed: boolean, t: Mess
   return t.nextPeriodIn.replace("{days}", String(days));
 }
 
+export function nextPeriodStat(
+  days: number | null,
+  t: Messages,
+): { value: number | string; label: string } {
+  if (days === null) return { value: "—", label: t.untilNextPeriod };
+  if (days < 0) return { value: -days, label: t.periodLateStat };
+  return { value: days, label: t.untilNextPeriod };
+}
+
 export function initialProbabilityLabel(probability: number, t: Messages): string {
   const percent = Math.round(probability * 100);
   if (percent <= 0) return t.initialProbabilityTodayUnderOne;

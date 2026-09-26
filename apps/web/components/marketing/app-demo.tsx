@@ -25,6 +25,7 @@ import {
   visiblePossiblePeriodStarts,
 } from "@/lib/cycle/calendar-markers";
 import { cycleOverview, phaseBody, phaseLabel } from "@/lib/cycle/phases";
+import { nextPeriodStat } from "@/lib/cycle/period-timing";
 import {
   addDaysIso,
   emptyDayLog,
@@ -611,6 +612,7 @@ function PatternsTab({
   history: ReturnType<typeof patternStats>["completedCycles"];
   maxLen: number;
 }) {
+  const periodStat = nextPeriodStat(stats.nextPeriodInDays, t);
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-2">
@@ -637,9 +639,9 @@ function PatternsTab({
         />
         {stats.forecastingEnabled ? (
           <StatTile
-            value={stats.nextPeriodInDays ?? "—"}
+            value={periodStat.value}
             unit={t.days}
-            label={t.untilNextPeriod}
+            label={periodStat.label}
             icon={<CalendarDays className="size-3.5" />}
             tone="accent"
           />

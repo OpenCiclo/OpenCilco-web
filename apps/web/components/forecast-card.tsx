@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 import { useCiclo } from "@/lib/client/ciclo-context";
+import { initialChartWindow, untruncatedDaily } from "@/lib/cycle/initial-chart";
 import { cycleOverview } from "@/lib/cycle/phases";
 import { initialProbabilityLabel, periodTimingChip } from "@/lib/cycle/period-timing";
 import { todayIsoUtc } from "@/lib/diary";
@@ -70,7 +71,9 @@ export function ForecastCard() {
 
   const forecast = overview.forecast;
   const anchorDate = overview.nextPeriodDate ?? forecast.mostLikelyDate;
+  const late = overview.nextPeriodInDays !== null && overview.nextPeriodInDays < 0;
   const anchorLength = daysBetween(forecast.lastPeriodStart, anchorDate);
+  const cycleLengthDays = late ? (overview.currentCycleDay ?? anchorLength) : anchorLength;
   const observed = overview.currentPhase?.source === "observed";
   const dueOrLate = overview.nextPeriodInDays !== null && overview.nextPeriodInDays <= 0;
   const timing = dueOrLate ? periodTimingChip(overview.nextPeriodInDays, observed, t) : null;
@@ -78,6 +81,8 @@ export function ForecastCard() {
     dueOrLate && !observed && overview.initialStartProbability !== null
       ? initialProbabilityLabel(overview.initialStartProbability, t)
       : null;
+  const chartWindow = late ? initialChartWindow(anchorDate, today) : null;
+  const chartDaily = late ? untruncatedDaily(forecast) : forecast.dailyProbabilities;
   const uncertaintyLabel =
     forecast.uncertainty === "low"
       ? t.uncertaintyLow
@@ -89,7 +94,7 @@ export function ForecastCard() {
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <p className="text-sm text-muted-foreground">{t.nextStart}</p>
+        <p className="text-sm text-muted-foreground">{late ? t.expectedToStart : t.nextStart}</p>
         <p className="mt-2 text-4xl font-semibold tracking-tight">
           {formatDate(anchorDate, locale)}
         </p>
@@ -99,7 +104,7 @@ export function ForecastCard() {
         ) : null}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Badge>
-            {t.cycleLength}: {anchorLength} {t.days}
+            {t.cycleLength}: {cycleLengthDays} {t.days}
           </Badge>
           <Badge>
             {t.uncertainty}: {uncertaintyLabel}
@@ -119,12 +124,15 @@ export function ForecastCard() {
       </Card>
       <Card>
         <ForecastChart
-          daily={forecast.dailyProbabilities}
-          mostLikelyDate={forecast.mostLikelyDate}
-          interval={interval}
+          daily={chartDaily}
+          mostLikelyDate={late ? anchorDate : forecast.mostLikelyDate}
+          interval={late ? null : interval}
           referenceDate={today}
           locale={locale}
           t={t}
+          windowStart={chartWindow?.start}
+          windowEnd={chartWindow?.end}
+          hint={late ? t.forecastChartHintInitial : undefined}
         />
       </Card>
       <button
@@ -137,23 +145,25 @@ export function ForecastCard() {
       </button>
       {showMoreInfo ? (
         <>
-          <Card>
-            <p className="mb-3 text-sm font-medium">{t.fromToday}</p>
-            <div className="grid grid-cols-2 gap-4">
-              {NEXT_WINDOWS.map((window) => {
-                const value =
-                  forecast.probabilityWithinNextNDays[window] ??
-                  probabilityWithinNextDays(forecast.dailyProbabilities, today, Number(window));
-                return (
-                  <Stat
-                    key={`next-${window}`}
-                    label={`${t.within} ${window} ${t.days}`}
-                    value={percent(value)}
-                  />
-                );
-              })}
-            </div>
-          </Card>
+          {late ? null : (
+            <Card>
+              <p className="mb-3 text-sm font-medium">{t.fromToday}</p>
+              <div className="grid grid-cols-2 gap-4">
+                {NEXT_WINDOWS.map((window) => {
+                  const value =
+                    forecast.probabilityWithinNextNDays[window] ??
+                    probabilityWithinNextDays(forecast.dailyProbabilities, today, Number(window));
+                  return (
+                    <Stat
+                      key={`next-${window}`}
+                      label={`${t.within} ${window} ${t.days}`}
+                      value={percent(value)}
+                    />
+                  );
+                })}
+              </div>
+            </Card>
+          )}
           <Card>
             <p className="mb-3 text-sm font-medium">{t.aroundLikely}</p>
             <div className="grid grid-cols-2 gap-4">
