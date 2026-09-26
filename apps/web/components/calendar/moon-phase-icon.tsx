@@ -1,8 +1,25 @@
 // Copyright © 2026 Emma Flora Harbison & Luis Rey Sánchez
 // SPDX-License-Identifier: Apache-2.0
 
-import type { LunarDayInfo } from "@/lib/lunar/phases";
+import type { LunarDayInfo, MoonPhaseId } from "@/lib/lunar/phases";
+import type { Messages } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+
+const MOON_PHASE_LABEL_KEYS: Record<MoonPhaseId, keyof Messages> = {
+  newMoon: "moonPhaseNewMoon",
+  waxingCrescent: "moonPhaseWaxingCrescent",
+  firstQuarter: "moonPhaseFirstQuarter",
+  waxingGibbous: "moonPhaseWaxingGibbous",
+  fullMoon: "moonPhaseFullMoon",
+  waningGibbous: "moonPhaseWaningGibbous",
+  lastQuarter: "moonPhaseLastQuarter",
+  waningCrescent: "moonPhaseWaningCrescent",
+};
+
+export function moonPhaseText(info: LunarDayInfo, t: Messages): string {
+  const phaseName = String(t[MOON_PHASE_LABEL_KEYS[info.phaseId]]);
+  return t.moonPhaseLabel.replace("{phase}", phaseName).replace("{percent}", String(info.percent));
+}
 
 /**
  * Compact northern-hemisphere moon disk.

@@ -32,7 +32,9 @@ import {
   toggleFavoriteSymptom,
   toggleLoggedSymptom,
 } from "@/lib/symptoms/selection";
+import { lunarDayInfo } from "@/lib/lunar/phases";
 import { cn } from "@/lib/utils";
+import { MoonPhaseIcon, moonPhaseText } from "@/components/calendar/moon-phase-icon";
 import { MoreSymptomsView } from "@/components/calendar/more-symptoms-view";
 import { SymptomChip } from "@/components/calendar/symptom-chip";
 import { Textarea } from "@/components/ui/input";
@@ -67,6 +69,21 @@ const FLOW_LABELS: Record<FlowLevel, keyof Messages> = {
   heavy: "flowHeavy",
 };
 
+function MoonPhaseLine({
+  info,
+  label,
+}: {
+  info: ReturnType<typeof lunarDayInfo>;
+  label: string;
+}) {
+  return (
+    <p className="flex items-center gap-1 text-sm text-muted-foreground">
+      <MoonPhaseIcon info={info} label={label} />
+      <span>{label}</span>
+    </p>
+  );
+}
+
 function prefersReducedMotion() {
   return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
@@ -81,6 +98,7 @@ export function DaySheet({
   customSymptoms,
   saving,
   error,
+  lunarPhasesEnabled,
   onClose,
   onExited,
   onSave,
@@ -95,6 +113,7 @@ export function DaySheet({
   customSymptoms: CustomSymptomDefinition[];
   saving: boolean;
   error: string | null;
+  lunarPhasesEnabled: boolean;
   onClose: () => void;
   onExited: () => void;
   onSave: (log: DayLog) => void | Promise<void>;
@@ -155,6 +174,8 @@ export function DaySheet({
     month: "long",
     day: "numeric",
   });
+  const moonInfo = lunarPhasesEnabled ? lunarDayInfo(iso) : null;
+  const moonLabel = moonInfo ? moonPhaseText(moonInfo, t) : null;
   const hasData = !isEmptyDayLog(draft);
   const hadData = Boolean(log && !isEmptyDayLog(log));
 
@@ -256,15 +277,33 @@ export function DaySheet({
               </button>
             ) : null}
             <div className="min-w-0">
-              <p
-                id={titleId}
-                className="font-serif text-xl leading-tight text-card-foreground capitalize text-balance"
-              >
-                {view === "more" ? t.moreSymptoms : dateLabel}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {view === "more" ? dateLabel : t.howFeeling}
-              </p>
+              {view === "more" ? (
+                <>
+                  <p
+                    id={titleId}
+                    className="font-serif text-xl leading-tight text-card-foreground capitalize text-balance"
+                  >
+                    {t.moreSymptoms}
+                  </p>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <p className="text-sm text-muted-foreground">{dateLabel}</p>
+                    {moonInfo && moonLabel ? <MoonPhaseLine info={moonInfo} label={moonLabel} /> : null}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <p
+                      id={titleId}
+                      className="font-serif text-xl leading-tight text-card-foreground capitalize text-balance"
+                    >
+                      {dateLabel}
+                    </p>
+                    {moonInfo && moonLabel ? <MoonPhaseLine info={moonInfo} label={moonLabel} /> : null}
+                  </div>
+                  <p className="text-sm text-muted-foreground">{t.howFeeling}</p>
+                </>
+              )}
             </div>
           </div>
           <button

@@ -29,33 +29,18 @@ import {
 import { formatIsoUtc } from "@/lib/format-date";
 import type { Locale, Messages } from "@/lib/i18n";
 import { useCiclo } from "@/lib/client/ciclo-context";
-import { lunarDayInfo, type MoonPhaseId } from "@/lib/lunar/phases";
+import { lunarDayInfo } from "@/lib/lunar/phases";
 import { symptomColor, symptomLabel, symptomMeta } from "@/lib/symptoms/catalog";
 import { matchingFilterSymptoms } from "@/lib/symptoms/filter";
 import { cn } from "@/lib/utils";
 import { CycleStatusCard } from "@/components/calendar/cycle-status-card";
 import { DaySheet } from "@/components/calendar/day-sheet";
-import { MoonPhaseIcon } from "@/components/calendar/moon-phase-icon";
+import { MoonPhaseIcon, moonPhaseText } from "@/components/calendar/moon-phase-icon";
 import { SymptomFilterSheet } from "@/components/calendar/symptom-filter-sheet";
 import { InstallPrompt } from "@/components/install-prompt";
 
-const MOON_PHASE_LABEL_KEYS: Record<MoonPhaseId, keyof Messages> = {
-  newMoon: "moonPhaseNewMoon",
-  waxingCrescent: "moonPhaseWaxingCrescent",
-  firstQuarter: "moonPhaseFirstQuarter",
-  waxingGibbous: "moonPhaseWaxingGibbous",
-  fullMoon: "moonPhaseFullMoon",
-  waningGibbous: "moonPhaseWaningGibbous",
-  lastQuarter: "moonPhaseLastQuarter",
-  waningCrescent: "moonPhaseWaningCrescent",
-};
-
 function moonPhaseAccessibleLabel(iso: string, t: Messages): string {
-  const info = lunarDayInfo(iso);
-  const phaseName = String(t[MOON_PHASE_LABEL_KEYS[info.phaseId]]);
-  return t.moonPhaseLabel
-    .replace("{phase}", phaseName)
-    .replace("{percent}", String(info.percent));
+  return moonPhaseText(lunarDayInfo(iso), t);
 }
 
 export function CalendarScreen() {
@@ -386,6 +371,7 @@ export function CalendarScreen() {
         onClose={closeSheet}
         onExited={handleSheetExited}
         onSave={(log) => saveDay(log)}
+        lunarPhasesEnabled={lunarPhasesEnabled}
         onUpdateSymptomPreferences={updateSymptomPreferences}
       />
 
