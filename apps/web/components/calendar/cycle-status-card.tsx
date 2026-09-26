@@ -4,8 +4,10 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { Info } from "lucide-react";
 
 import { coverageInterval, ForecastChart } from "@/components/forecast-chart";
+import { ForecastInfoDialog } from "@/components/calendar/forecast-info-dialog";
 import { SeasonGuideOverlay, type SeasonOriginRect } from "@/components/calendar/season-guide-overlay";
 import { SeasonDecor } from "@/components/calendar/season-scene";
 import {
@@ -169,7 +171,9 @@ function PhaseStatusCard({
 }) {
   const cardRef = useRef<HTMLElement>(null);
   const openButtonRef = useRef<HTMLButtonElement>(null);
+  const infoButtonRef = useRef<HTMLButtonElement>(null);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [closing, setClosing] = useState(false);
   const [origin, setOrigin] = useState<SeasonOriginRect | null>(null);
   const seasonName = String(t[SEASON_LABELS[season]]);
@@ -186,6 +190,11 @@ function PhaseStatusCard({
     }
     setClosing(true);
   }, [closing, guideOpen]);
+
+  const closeInfo = useCallback(() => {
+    setInfoOpen(false);
+    infoButtonRef.current?.focus();
+  }, []);
 
   function openGuide() {
     const rect = cardRef.current?.getBoundingClientRect();
@@ -212,22 +221,38 @@ function PhaseStatusCard({
             <p className="text-sm font-medium opacity-90">
               {t.cycleDay.replace("{day}", String(cycleDay))}
             </p>
-            {visualSeasons ? (
+            <div className="flex items-center gap-1.5">
               <button
-                ref={openButtonRef}
+                ref={infoButtonRef}
                 type="button"
                 onClick={(event) => {
                   event.stopPropagation();
-                  openGuide();
+                  setInfoOpen(true);
                 }}
-                aria-expanded={guideOpen}
+                aria-expanded={infoOpen}
                 aria-haspopup="dialog"
-                aria-label={t.seasonGuideOpen.replace("{season}", seasonName)}
-                className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm transition-transform active:scale-90"
+                aria-label={t.forecastInfoOpen}
+                className="flex size-7 items-center justify-center rounded-full bg-white/15 backdrop-blur-sm transition-transform active:scale-90"
               >
-                {seasonName}
+                <Info className="size-3.5" aria-hidden />
               </button>
-            ) : null}
+              {visualSeasons ? (
+                <button
+                  ref={openButtonRef}
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    openGuide();
+                  }}
+                  aria-expanded={guideOpen}
+                  aria-haspopup="dialog"
+                  aria-label={t.seasonGuideOpen.replace("{season}", seasonName)}
+                  className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold backdrop-blur-sm transition-transform active:scale-90"
+                >
+                  {seasonName}
+                </button>
+              ) : null}
+            </div>
           </div>
           <p className="mt-1 font-serif text-2xl">
             {phaseLabel(phaseName, t)}
@@ -252,6 +277,7 @@ function PhaseStatusCard({
           ) : null}
         </div>
       </section>
+      {infoOpen ? <ForecastInfoDialog t={t} onClose={closeInfo} /> : null}
       {overlayVisible && origin ? (
         <SeasonGuideOverlay
           origin={origin}

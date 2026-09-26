@@ -418,6 +418,13 @@ const es = {
   seasonSummer: "Verano",
   seasonFall: "Otoño",
   seasonGuideOpen: "Qué es {season}",
+  forecastInfoOpen: "Cómo se calcula el pronóstico",
+  forecastInfoTitle: "Cómo se calcula el pronóstico",
+  forecastInfoPrior:
+    "Con pocos ciclos completos, o con ninguno, Ciclo usa una duración típica de un estudio público con ciclos reales: 42 personas en Canadá (mcPHASES). No es una media de todas las mujeres del mundo.",
+  forecastInfoPersonal:
+    "Cada ciclo completo que registras pesa más. Con pocos, el estudio sigue pesando. Con varios, manda más tu duración habitual. Los síntomas no entran en ese cálculo.",
+  forecastInfoMore: "Saber más",
   seasonGuideMeaning: "Qué significa",
   seasonGuideGoodFor: "Para qué suele ir bien",
   seasonGuideDo: "Qué suele ayudar",
@@ -898,6 +905,13 @@ const en = {
   seasonSummer: "Summer",
   seasonFall: "Fall",
   seasonGuideOpen: "About {season}",
+  forecastInfoOpen: "How the forecast is calculated",
+  forecastInfoTitle: "How the forecast is calculated",
+  forecastInfoPrior:
+    "With few completed cycles, or none, Ciclo uses a typical length from a public study of real cycles: 42 people in Canada (mcPHASES). It is not an average of all women worldwide.",
+  forecastInfoPersonal:
+    "Each completed cycle you log weighs more. With few, the study still weighs a lot. With several, your usual length matters more. Symptoms are not part of that calculation.",
+  forecastInfoMore: "Learn more",
   seasonGuideMeaning: "What this means",
   seasonGuideGoodFor: "What this season is often good for",
   seasonGuideDo: "What often helps",
