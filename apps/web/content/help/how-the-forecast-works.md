@@ -27,6 +27,10 @@ Uncertainty stays **high** when you have fewer than about three completed cycles
 
 A day with no log is **unknown**, not proof that the period did not happen.
 
+## When the expected day has passed
+
+The Calendar home card and the first card on Patterns keep the original most-likely day. Once that day has passed without a logged period start, they count the days late and quote today's chance from the initial forecast. They do not move the date forward. The chart on Patterns still removes past days and renormalizes what remains.
+
 ## Phases vs the forecast
 
 The engine’s job is the **next start**. The words Follicular / Ovulation / Luteal on the home card are a separate calendar heuristic. See [Calendar phases and “estimated”](/help/calendar-phases-estimated).

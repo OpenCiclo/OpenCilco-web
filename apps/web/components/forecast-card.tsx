@@ -5,7 +5,9 @@ import Link from "next/link";
 
 import { useCiclo } from "@/lib/client/ciclo-context";
 import { cycleOverview } from "@/lib/cycle/phases";
+import { initialProbabilityLabel, periodTimingChip } from "@/lib/cycle/period-timing";
 import { todayIsoUtc } from "@/lib/diary";
+import { daysBetween } from "@/lib/forecast/math";
 import type { DailyProbability } from "@/lib/forecast/types";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -67,6 +69,15 @@ export function ForecastCard() {
   }
 
   const forecast = overview.forecast;
+  const anchorDate = overview.nextPeriodDate ?? forecast.mostLikelyDate;
+  const anchorLength = daysBetween(forecast.lastPeriodStart, anchorDate);
+  const observed = overview.currentPhase?.source === "observed";
+  const dueOrLate = overview.nextPeriodInDays !== null && overview.nextPeriodInDays <= 0;
+  const timing = dueOrLate ? periodTimingChip(overview.nextPeriodInDays, observed, t) : null;
+  const initialProbability =
+    dueOrLate && !observed && overview.initialStartProbability !== null
+      ? initialProbabilityLabel(overview.initialStartProbability, t)
+      : null;
   const uncertaintyLabel =
     forecast.uncertainty === "low"
       ? t.uncertaintyLow
@@ -80,11 +91,15 @@ export function ForecastCard() {
       <Card>
         <p className="text-sm text-muted-foreground">{t.nextStart}</p>
         <p className="mt-2 text-4xl font-semibold tracking-tight">
-          {formatDate(forecast.mostLikelyDate, locale)}
+          {formatDate(anchorDate, locale)}
         </p>
+        {timing ? <p className="mt-2 text-sm font-semibold text-foreground">{timing}</p> : null}
+        {initialProbability ? (
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{initialProbability}</p>
+        ) : null}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Badge>
-            {t.cycleLength}: {forecast.mostLikelyCycleLength} {t.days}
+            {t.cycleLength}: {anchorLength} {t.days}
           </Badge>
           <Badge>
             {t.uncertainty}: {uncertaintyLabel}
