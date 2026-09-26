@@ -83,12 +83,6 @@ export function ForecastCard() {
       : null;
   const chartWindow = late ? initialChartWindow(anchorDate, today) : null;
   const chartDaily = late ? untruncatedDaily(forecast) : forecast.dailyProbabilities;
-  const uncertaintyLabel =
-    forecast.uncertainty === "low"
-      ? t.uncertaintyLow
-      : forecast.uncertainty === "medium"
-        ? t.uncertaintyMedium
-        : t.uncertaintyHigh;
   const interval = coverageInterval(forecast.dailyProbabilities, 0.8);
 
   return (
@@ -105,9 +99,6 @@ export function ForecastCard() {
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Badge>
             {t.cycleLength}: {cycleLengthDays} {t.days}
-          </Badge>
-          <Badge>
-            {t.uncertainty}: {uncertaintyLabel}
           </Badge>
           {overview.expectedPeriodLength ? (
             <Badge>
