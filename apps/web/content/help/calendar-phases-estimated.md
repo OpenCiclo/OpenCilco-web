@@ -38,6 +38,14 @@ These labels are educational context. They are not a diagnosis, a fertility test
 
 If you turn forecasting off, Ciclo only shows a phase when flow is observed.
 
+## When the expected day passes
+
+The most likely start is taken from the full forecast, before days already passed are dropped. The calendar keeps that day marked. It does not move the marker forward.
+
+If that day arrives and you have not logged a new period start, the home card stays on the phase (usually **Luteal · estimated**). On that day it says the period may start today. After it, the card counts days late from that date. It also quotes today's chance from the **initial** forecast. Example: if 10 October was 30%, 11 October 15%, and 12 October 11%, then on 12 October the card says you are 2 days late and that the initial forecast gave today an 11% chance. It does not rebuild the chart so today looks like the new most likely day.
+
+The Patterns tab still shows the forecast with past days removed. That chart answers “what is still ahead?” The calendar does not.
+
 ## Not the same as the period forecast
 
 The forecast engine predicts the **next period start**. Phase labels reuse those dates as a calendar story. They are not a clinical ovulation model.

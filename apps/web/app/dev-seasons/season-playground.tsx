@@ -51,6 +51,7 @@ function previewOverview(phase: CyclePhase, source: PhaseSource): CycleOverview 
     periodLengthRange: { min: 4, max: 6 },
     nextPeriodDate: "2026-09-15",
     nextPeriodInDays: sample.nextPeriodInDays,
+    initialStartProbability: null,
     forecast: null,
     forecastingEnabled: true,
     periodRuns: [],

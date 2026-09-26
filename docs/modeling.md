@@ -74,6 +74,8 @@ Mapping to dates: `next_start = last_start + L days`.
 
 If `reference_date` is after `last_start`, probability mass on dates **before** `reference_date` is removed and the remainder renormalized for the **display** forecast. That is a practical “what is still in the future?” view. Walk-forward scoring uses `reference_date = last_start` so the next cycle is entirely in the future (no truncation). Incomplete-history notes fire when elapsed days look suspiciously long; the observation is not deleted.
 
+The calendar does not follow that truncated date. It keeps the unconditional mode (the most likely day of the full distribution) marked, including after that day has passed. The home card then counts days late from that day and quotes today's probability from the untruncated distribution. Patterns still shows the truncated display forecast.
+
 ## Period duration (web, derived)
 
 The published `predict()` path still forecasts **cycle length / next start only**. The web app then derives bleeding duration separately:
@@ -81,7 +83,7 @@ The published `predict()` path still forecasts **cycle length / next start only*
 - Closed period runs: consecutive `flow` days from a start, cut at the next observed start. The open cycle is excluded.
 - Descriptive UI stats use the **mean** and min–max of those closed lengths.
 - The expected bleeding length is the **median** of the same closed lengths (rounded). No recency weights.
-- The expected period interval is `[mostLikelyDate, mostLikelyDate + expectedDays - 1]`. Alternate probable start dates keep their start markers and do not spawn extra bleeding bands.
+- The expected period interval on the calendar is `[anchor, anchor + expectedDays - 1]`, where `anchor` is the unconditional mode. That matches `mostLikelyDate` until that day has passed. Alternate probable start dates keep their start markers and do not spawn extra bleeding bands.
 - Intermenstrual bleeding is a symptom. It is not `flow` and does not create starts, period runs, or pool lengths.
 - If the user turns forecasts off, `predict()` is not called in the UI. Observed means, ranges, completed-cycle history, and current cycle day remain.
 

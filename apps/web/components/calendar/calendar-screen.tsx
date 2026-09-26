@@ -11,7 +11,7 @@ import {
   isEditableDiaryDate,
   isEstimatedBleedingDate,
   isEstimatedFertileDate,
-  possiblePeriodStartDates,
+  visiblePossiblePeriodStarts,
 } from "@/lib/cycle/calendar-markers";
 import { cycleOverview } from "@/lib/cycle/phases";
 import {
@@ -98,12 +98,14 @@ export function CalendarScreen() {
   const overview = useMemo(() => cycleOverview(diary, today), [diary, today]);
   const possibleStarts = useMemo(
     () =>
-      overview.forecast
-        ? possiblePeriodStartDates(overview.forecast.dailyProbabilities, today)
-        : new Set<string>(),
-    [overview.forecast, today],
+      visiblePossiblePeriodStarts(
+        overview.forecast?.dailyProbabilities,
+        today,
+        overview.nextPeriodInDays,
+      ),
+    [overview.forecast, overview.nextPeriodInDays, today],
   );
-  const mostLikelyStart = overview.forecast?.mostLikelyDate ?? null;
+  const mostLikelyStart = overview.forecastingEnabled ? overview.nextPeriodDate : null;
   const filtersActive = activeFilters.length > 0;
   const cells = monthCells(year, month, weekStartsOn);
   const labels = weekdayLabels(locale, weekStartsOn);

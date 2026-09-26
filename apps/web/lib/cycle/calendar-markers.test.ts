@@ -12,6 +12,7 @@ import {
   isEstimatedFertileDate,
   isInEstimatedFertileWindow,
   possiblePeriodStartDates,
+  visiblePossiblePeriodStarts,
 } from "./calendar-markers";
 
 describe("calendar markers", () => {
@@ -57,6 +58,20 @@ describe("calendar markers", () => {
       "2026-08-21",
     );
     expect([...dates].sort()).toEqual(["2026-09-14", "2026-09-15"]);
+  });
+
+  it("hides future possible starts once the anchored day is late", () => {
+    const daily = [
+      { date: "2026-10-10", probability: 0.3 },
+      { date: "2026-10-11", probability: 0.15 },
+      { date: "2026-10-12", probability: 0.11 },
+    ];
+    expect([...visiblePossiblePeriodStarts(daily, "2026-10-08", 2)].sort()).toEqual([
+      "2026-10-10",
+      "2026-10-11",
+    ]);
+    expect(visiblePossiblePeriodStarts(daily, "2026-10-12", -2).size).toBe(0);
+    expect(visiblePossiblePeriodStarts(null, "2026-10-12", 1).size).toBe(0);
   });
 
   it("blocks writing diary dates after today", () => {

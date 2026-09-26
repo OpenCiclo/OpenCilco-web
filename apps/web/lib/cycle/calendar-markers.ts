@@ -58,6 +58,16 @@ export function possiblePeriodStartDates(
   );
 }
 
+/** Future possible-start dots use the moving forecast. Hide them once the anchored day is in the past. */
+export function visiblePossiblePeriodStarts(
+  daily: DailyProbability[] | null | undefined,
+  today: string,
+  nextPeriodInDays: number | null,
+): Set<string> {
+  if (!daily || (nextPeriodInDays !== null && nextPeriodInDays < 0)) return new Set();
+  return possiblePeriodStartDates(daily, today);
+}
+
 export function isEstimatedBleedingDate(
   date: string,
   window: { dates: string[] } | null | undefined,

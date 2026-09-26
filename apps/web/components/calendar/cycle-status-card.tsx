@@ -41,20 +41,22 @@ export function CycleStatusCard({
   visualSeasons: boolean;
 }) {
   const phase = overview.currentPhase;
-  const nextChip =
-    overview.nextPeriodInDays === null
-      ? null
-      : overview.nextPeriodInDays === 0
-        ? t.nextPeriodToday
-        : overview.nextPeriodInDays < 0
-          ? t.nextPeriodOverdue
-          : t.nextPeriodIn.replace("{days}", String(overview.nextPeriodInDays));
+  const observed = phase?.source === "observed";
+  const nextChip = periodTimingChip(overview.nextPeriodInDays, observed === true, t);
+  const initialProbability =
+    !observed &&
+    overview.nextPeriodInDays !== null &&
+    overview.nextPeriodInDays <= 0 &&
+    overview.initialStartProbability !== null
+      ? initialProbabilityLabel(overview.initialStartProbability, t)
+      : null;
 
   if (phase) {
     const season = phaseSeason(phase.phase);
     return (
       <PhaseStatusCard
         cycleDay={phase.cycleDay}
+        initialProbability={initialProbability}
         locale={locale}
         nextChip={nextChip}
         phaseName={phase.phase}
@@ -124,8 +126,29 @@ export function CycleStatusCard({
   );
 }
 
+function periodTimingChip(days: number | null, observed: boolean, t: Messages): string | null {
+  if (days === null) return null;
+  if (days < 0) {
+    if (observed) return null;
+    const late = -days;
+    return late === 1 ? t.periodLateOne : t.periodLateMany.replace("{days}", String(late));
+  }
+  if (days === 0) {
+    if (observed) return null;
+    return t.nextPeriodToday;
+  }
+  return t.nextPeriodIn.replace("{days}", String(days));
+}
+
+function initialProbabilityLabel(probability: number, t: Messages): string {
+  const percent = Math.round(probability * 100);
+  if (percent <= 0) return t.initialProbabilityTodayUnderOne;
+  return t.initialProbabilityToday.replace("{percent}", String(percent));
+}
+
 function PhaseStatusCard({
   cycleDay,
+  initialProbability,
   locale,
   nextChip,
   phaseName,
@@ -135,6 +158,7 @@ function PhaseStatusCard({
   visualSeasons,
 }: {
   cycleDay: number;
+  initialProbability: string | null;
   locale: Locale;
   nextChip: string | null;
   phaseName: CyclePhase;
@@ -221,6 +245,11 @@ function PhaseStatusCard({
               {nextChip}
             </p>
           ) : null}
+          {initialProbability ? (
+            <p className="mt-2 max-w-[18rem] text-sm leading-relaxed text-pretty opacity-90">
+              {initialProbability}
+            </p>
+          ) : null}
         </div>
       </section>
       {overlayVisible && origin ? (
@@ -232,6 +261,7 @@ function PhaseStatusCard({
           sourceEstimated={sourceEstimated}
           cycleDay={cycleDay}
           nextChip={nextChip}
+          initialProbability={initialProbability}
           locale={locale}
           t={t}
           onClose={closeGuide}

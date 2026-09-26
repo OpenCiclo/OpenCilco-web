@@ -22,7 +22,7 @@ import {
 import {
   isEstimatedBleedingDate,
   isEstimatedFertileDate,
-  possiblePeriodStartDates,
+  visiblePossiblePeriodStarts,
 } from "@/lib/cycle/calendar-markers";
 import { cycleOverview, phaseBody, phaseLabel } from "@/lib/cycle/phases";
 import {
@@ -163,12 +163,14 @@ export function AppDemo({ locale }: { locale: Locale }) {
 
   const possibleStarts = useMemo(
     () =>
-      overview.forecast
-        ? possiblePeriodStartDates(overview.forecast.dailyProbabilities, today)
-        : new Set<string>(),
-    [overview.forecast, today],
+      visiblePossiblePeriodStarts(
+        overview.forecast?.dailyProbabilities,
+        today,
+        overview.nextPeriodInDays,
+      ),
+    [overview.forecast, overview.nextPeriodInDays, today],
   );
-  const mostLikelyStart = overview.forecast?.mostLikelyDate ?? null;
+  const mostLikelyStart = overview.forecastingEnabled ? overview.nextPeriodDate : null;
   const phase = overview.currentPhase;
   const quickCatalog = useMemo(
     () => quickSymptomCatalog(catalog, diary.favoriteSymptomIds, draft.symptoms),

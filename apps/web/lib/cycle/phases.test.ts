@@ -3,12 +3,16 @@
 
 import { describe, expect, it } from "vitest";
 
-import { parseDiary } from "@/lib/diary";
+import { addDaysIso, parseDiary } from "@/lib/diary";
+import { mostLikelyLength } from "@/lib/forecast/distribution";
+import { daysBetween } from "@/lib/forecast/math";
 import {
+  anchoredPeriodDate,
   cycleOverview,
   isPeriodDueOrOverdue,
   phaseAtDate,
   phaseSeason,
+  untruncatedStartProbability,
 } from "@/lib/cycle/phases";
 
 function diaryWithStarts(starts: string[], extraDays: Record<string, object> = {}) {
@@ -94,20 +98,51 @@ describe("cycle phases", () => {
     expect(overview.forecast).toBeNull();
   });
 
-  it("marks the period as due or overdue when the forecast date arrives without bleeding", () => {
+  it("keeps the open cycle in luteal after the expected start", () => {
+    const diary = diaryWithStarts(["2026-06-01", "2026-06-29"]);
+    const late = phaseAtDate(diary, "2026-07-31", "2026-07-27", 5);
+    expect(late?.phase).toBe("luteal");
+    expect(late?.source).toBe("estimated");
+    expect(late?.cycleStart).toBe("2026-06-29");
+  });
+
+  it("anchors the expected start and quotes today's untruncated probability when late", () => {
     const diary = diaryWithStarts(["2026-06-01", "2026-06-29"]);
     const open = cycleOverview(diary, "2026-07-10");
-    expect(open.nextPeriodDate).toBeTruthy();
+    const anchor = open.nextPeriodDate;
+    expect(anchor).toBeTruthy();
+    expect(anchor).toBe(anchoredPeriodDate(open.forecast!));
+    expect(anchor).toBe(
+      addDaysIso("2026-06-29", mostLikelyLength(open.forecast!.cycleLengthDistribution)),
+    );
+    expect(open.nextPeriodInDays).toBeGreaterThan(0);
+    expect(isPeriodDueOrOverdue(open)).toBe(false);
 
-    const due = cycleOverview(diary, open.nextPeriodDate!);
-    expect(due.currentPhase).toBeNull();
-    expect(due.forecast).not.toBeNull();
+    const due = cycleOverview(diary, anchor!);
+    expect(due.currentPhase?.phase).toBe("luteal");
+    expect(due.currentPhase?.source).toBe("estimated");
+    expect(due.nextPeriodDate).toBe(anchor);
     expect(due.nextPeriodInDays).toBe(0);
-    expect(isPeriodDueOrOverdue(due)).toBe(true);
+    expect(due.initialStartProbability).toBe(untruncatedStartProbability(due.forecast!, anchor!));
+    const dueRenormalized = due.forecast!.dailyProbabilities.find((item) => item.date === anchor);
+    expect(dueRenormalized).toBeTruthy();
+    expect(due.initialStartProbability).toBeLessThan(dueRenormalized!.probability);
 
-    const overdue = cycleOverview(diary, "2026-09-01");
-    expect(overdue.currentPhase).toBeNull();
-    expect(overdue.forecast).not.toBeNull();
-    expect(isPeriodDueOrOverdue(overdue)).toBe(true);
+    const lateDay = addDaysIso(anchor!, 2);
+    const overdue = cycleOverview(diary, lateDay);
+    expect(overdue.currentPhase?.phase).toBe("luteal");
+    expect(overdue.currentPhase?.source).toBe("estimated");
+    expect(overdue.nextPeriodDate).toBe(anchor);
+    expect(overdue.nextPeriodInDays).toBe(-2);
+    expect(overdue.initialStartProbability).toBe(untruncatedStartProbability(overdue.forecast!, lateDay));
+    const length = daysBetween(overdue.forecast!.lastPeriodStart, lateDay);
+    const index = overdue.forecast!.cycleLengthDistribution.supportDays.indexOf(length);
+    expect(overdue.initialStartProbability).toBe(
+      overdue.forecast!.cycleLengthDistribution.probabilities[index],
+    );
+    const lateRenormalized = overdue.forecast!.dailyProbabilities.find((item) => item.date === lateDay);
+    expect(lateRenormalized).toBeTruthy();
+    expect(overdue.initialStartProbability).not.toBe(lateRenormalized!.probability);
+    expect(isPeriodDueOrOverdue(overdue)).toBe(false);
   });
 });

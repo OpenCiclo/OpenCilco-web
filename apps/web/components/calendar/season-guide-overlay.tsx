@@ -35,6 +35,7 @@ export function SeasonGuideOverlay({
   sourceEstimated,
   cycleDay,
   nextChip,
+  initialProbability,
   locale,
   t,
   onClose,
@@ -47,6 +48,7 @@ export function SeasonGuideOverlay({
   sourceEstimated: boolean;
   cycleDay: number;
   nextChip: string | null;
+  initialProbability: string | null;
   locale: Locale;
   t: Messages;
   onClose: () => void;
@@ -168,6 +170,11 @@ export function SeasonGuideOverlay({
           {nextChip ? (
             <p className="mt-3 inline-flex items-center rounded-full bg-primary-foreground/15 px-3 py-1 text-xs font-semibold">
               {nextChip}
+            </p>
+          ) : null}
+          {initialProbability ? (
+            <p className="mt-2 max-w-[18rem] text-sm leading-relaxed text-pretty opacity-90">
+              {initialProbability}
             </p>
           ) : null}
         </div>

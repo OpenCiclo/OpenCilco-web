@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { addDaysIso, todayIsoUtc, type Diary } from "@/lib/diary";
+import { mostLikelyLength } from "@/lib/forecast/distribution";
 import { daysBetween } from "@/lib/forecast/math";
 import { predict } from "@/lib/forecast/predict";
 import type { Forecast } from "@/lib/forecast/types";
@@ -40,6 +41,8 @@ export type CycleOverview = {
   periodLengthRange: { min: number; max: number } | null;
   nextPeriodDate: string | null;
   nextPeriodInDays: number | null;
+  /** Untruncated probability that the open cycle starts on `today`. Null when forecasting is off. */
+  initialStartProbability: number | null;
   forecast: Forecast | null;
   forecastingEnabled: boolean;
   periodRuns: PeriodRun[];
@@ -107,20 +110,32 @@ export function cycleDayAtDate(starts: string[], date: string): number | null {
 export function cycleContaining(date: string, starts: string[], predictedNext: string | null) {
   const ordered = [...starts].sort();
   if (ordered.length === 0) return null;
-  let start = ordered[0];
-  if (date < start) return null;
-  let next = predictedNext;
+  if (date < ordered[0]) return null;
   for (let i = 0; i < ordered.length; i += 1) {
     const current = ordered[i];
-    const following = ordered[i + 1] ?? predictedNext;
-    if (date >= current && (!following || date < following)) {
-      start = current;
-      next = following ?? predictedNext;
-      break;
+    const loggedNext = ordered[i + 1] ?? null;
+    if (loggedNext) {
+      if (date >= current && date < loggedNext) return { start: current, next: loggedNext };
+      continue;
     }
+    if (date < current || !predictedNext) return null;
+    // The open cycle stays open after the expected start until a new start is logged.
+    return { start: current, next: predictedNext };
   }
-  if (!next || date >= next) return null;
-  return { start, next };
+  return null;
+}
+
+/** Most likely start from the full length distribution, before dates already passed are dropped. */
+export function anchoredPeriodDate(forecast: Forecast): string {
+  return addDaysIso(forecast.lastPeriodStart, mostLikelyLength(forecast.cycleLengthDistribution));
+}
+
+/** Probability of `date` on the untruncated length distribution. Zero when the day is outside support. */
+export function untruncatedStartProbability(forecast: Forecast, date: string): number {
+  const length = daysBetween(forecast.lastPeriodStart, date);
+  const index = forecast.cycleLengthDistribution.supportDays.indexOf(length);
+  if (index < 0) return 0;
+  return forecast.cycleLengthDistribution.probabilities[index] ?? 0;
 }
 
 function inOvulationWindow(date: string, nextStart: string): boolean {
@@ -211,6 +226,7 @@ export function cycleOverview(diary: Diary, today = todayIsoUtc()): CycleOvervie
     periodLengthRange: periodDuration.range,
     nextPeriodDate: null,
     nextPeriodInDays: null,
+    initialStartProbability: null,
     forecast: null,
     forecastingEnabled,
     periodRuns: runs,
@@ -230,16 +246,18 @@ export function cycleOverview(diary: Diary, today = todayIsoUtc()): CycleOvervie
   }
 
   const forecast = predict(diary.periodStarts, today);
-  const currentPhase = phaseAtDate(diary, today, forecast.mostLikelyDate, menstrualLength, {
+  const anchorDate = anchoredPeriodDate(forecast);
+  const currentPhase = phaseAtDate(diary, today, anchorDate, menstrualLength, {
     includeEstimated: true,
   });
   return {
     ...empty,
     currentPhase,
     currentCycleDay: currentPhase?.cycleDay ?? currentCycleDay,
-    expectedBleedingWindow: expectedBleedingWindow(forecast.mostLikelyDate, periodDuration.expectedDays),
-    nextPeriodDate: forecast.mostLikelyDate,
-    nextPeriodInDays: daysBetween(today, forecast.mostLikelyDate),
+    expectedBleedingWindow: expectedBleedingWindow(anchorDate, periodDuration.expectedDays),
+    nextPeriodDate: anchorDate,
+    nextPeriodInDays: daysBetween(today, anchorDate),
+    initialStartProbability: untruncatedStartProbability(forecast, today),
     forecast,
   };
 }
