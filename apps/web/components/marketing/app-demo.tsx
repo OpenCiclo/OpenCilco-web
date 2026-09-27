@@ -551,14 +551,28 @@ function CalendarTab({
                         : possibleStart
                           ? "bg-primary/40 text-primary"
                           : estBleeding
-                            ? "border-2 border-dotted border-bleed bg-bleed/10 text-bleed"
+                            ? "relative bg-bleed/10 text-bleed"
                             : estFertile
                               ? "bg-fertile/20 text-fertile-foreground ring-1 ring-inset ring-fertile/50"
                               : "text-card-foreground hover:bg-muted",
                     isToday && !bleeding ? "ring-2 ring-primary ring-offset-1 ring-offset-background" : null,
                     selected === iso ? "outline outline-2 outline-offset-2 outline-primary/40" : null,
                   )}
-                >
+                  >
+                  {estBleeding && !bleeding ? (
+                    <svg viewBox="0 0 40 40" className="pointer-events-none absolute inset-0 size-full" aria-hidden>
+                      <circle
+                        cx="20"
+                        cy="20"
+                        r="18"
+                        fill="none"
+                        className="stroke-bleed"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeDasharray="0 11"
+                      />
+                    </svg>
+                  ) : null}
                   {Number(iso.slice(8, 10))}
                 </button>
                 <span className="mt-0.5 flex h-1 items-center gap-0.5">
