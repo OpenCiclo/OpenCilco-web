@@ -323,7 +323,7 @@ export function CalendarScreen() {
         <LegendDot className="bg-bleed" label={t.legendBleeding} />
         {overview.forecastingEnabled ? (
           <>
-            <LegendDot className="border border-dashed border-bleed bg-bleed/10" label={t.legendEstimatedBleeding} />
+            <LegendDot className="border border-dotted border-bleed bg-bleed/10" label={t.legendEstimatedBleeding} />
             <LegendDot className="bg-fertile" label={t.legendFertile} />
             <LegendDot className="border border-fertile bg-fertile/20" label={t.legendFertileWindow} />
             <LegendDot className="bg-primary" label={t.legendMostLikelyStart} />
@@ -503,14 +503,14 @@ function DayCell({
               : probabilityFill
                 ? probabilityFill
                 : estimatedBleeding
-                  ? "border-2 border-dashed border-bleed bg-bleed/10 text-bleed"
+                  ? "border-2 border-dotted border-bleed bg-bleed/10 text-bleed"
                   : estimatedFertile
                     ? "bg-fertile/20 text-fertile-foreground ring-1 ring-inset ring-fertile/50"
                     : isFuture
                       ? "text-muted-foreground/50"
                       : "text-card-foreground hover:bg-muted"),
           !bleeding && estimatedBleeding && (mostLikelyStart || possibleStart)
-            ? "border-2 border-dashed border-bleed"
+            ? "border-2 border-dotted border-bleed"
             : null,
           isToday && !bleeding && "ring-2 ring-primary ring-offset-1 ring-offset-card",
         )}

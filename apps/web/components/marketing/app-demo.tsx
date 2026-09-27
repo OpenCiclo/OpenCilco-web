@@ -551,7 +551,7 @@ function CalendarTab({
                         : possibleStart
                           ? "bg-primary/40 text-primary"
                           : estBleeding
-                            ? "border-2 border-dashed border-bleed bg-bleed/10 text-bleed"
+                            ? "border-2 border-dotted border-bleed bg-bleed/10 text-bleed"
                             : estFertile
                               ? "bg-fertile/20 text-fertile-foreground ring-1 ring-inset ring-fertile/50"
                               : "text-card-foreground hover:bg-muted",
