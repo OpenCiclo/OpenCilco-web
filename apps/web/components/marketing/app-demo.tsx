@@ -564,12 +564,12 @@ function CalendarTab({
                       <circle
                         cx="20"
                         cy="20"
-                        r="18"
+                        r="17.5"
                         fill="none"
                         className="stroke-bleed"
-                        strokeWidth="2"
+                        strokeWidth="3"
                         strokeLinecap="round"
-                        strokeDasharray="0 11"
+                        strokeDasharray="0 7"
                       />
                     </svg>
                   ) : null}
