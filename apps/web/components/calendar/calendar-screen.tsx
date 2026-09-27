@@ -323,7 +323,7 @@ export function CalendarScreen() {
         <LegendDot className="bg-bleed" label={t.legendBleeding} />
         {overview.forecastingEnabled ? (
           <>
-            <LegendDot className="bg-bleed/10" label={t.legendEstimatedBleeding} dotted />
+            <LegendDot className="border-2 border-dotted border-bleed bg-bleed/10" label={t.legendEstimatedBleeding} />
             <LegendDot className="bg-fertile" label={t.legendFertile} />
             <LegendDot className="border border-fertile bg-fertile/20" label={t.legendFertileWindow} />
             <LegendDot className="bg-primary" label={t.legendMostLikelyStart} />
@@ -503,17 +503,19 @@ function DayCell({
               : probabilityFill
                 ? probabilityFill
                 : estimatedBleeding
-                  ? "bg-bleed/10 text-bleed"
+                  ? "border-[3px] border-dotted border-bleed bg-bleed/10 text-bleed"
                   : estimatedFertile
                     ? "bg-fertile/20 text-fertile-foreground ring-1 ring-inset ring-fertile/50"
                     : isFuture
                       ? "text-muted-foreground/50"
                       : "text-card-foreground hover:bg-muted"),
+          !bleeding && estimatedBleeding && (mostLikelyStart || possibleStart)
+            ? "border-[3px] border-dotted border-bleed"
+            : null,
           isToday && !bleeding && "ring-2 ring-primary ring-offset-1 ring-offset-card",
         )}
         style={{ animationDelay: `${Math.min(index * 12, 320)}ms` }}
       >
-        {!bleeding && estimatedBleeding ? <DottedBleedRing /> : null}
         {day}
         <span className="absolute bottom-1 flex gap-0.5">
           {observedFertile && !bleeding ? <Sparkles className="size-2 text-fertile-foreground" /> : null}
@@ -581,39 +583,18 @@ function NavButton({
   );
 }
 
-function DottedBleedRing() {
-  return (
-    <svg viewBox="0 0 40 40" className="pointer-events-none absolute inset-0 size-full" aria-hidden>
-      <circle
-        cx="20"
-        cy="20"
-        r="17.5"
-        fill="none"
-        className="stroke-bleed"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeDasharray="0 7"
-      />
-    </svg>
-  );
-}
-
 function LegendDot({
   className,
   label,
   style,
-  dotted = false,
 }: {
   className: string;
   label: string;
   style?: React.CSSProperties;
-  dotted?: boolean;
 }) {
   return (
     <span className="flex items-center gap-1.5">
-      <span className={cn("relative size-2.5 rounded-full", className)} style={style}>
-        {dotted ? <DottedBleedRing /> : null}
-      </span>
+      <span className={cn("size-2.5 rounded-full", className)} style={style} />
       {label}
     </span>
   );
