@@ -29,7 +29,7 @@ Cursor: also see the short AGENTS.md at the repo root. Do not edit apps/web/AGEN
 
 ## Docs surfaces (do not mix)
 
-- `/learn` — health education (biology, symptoms, mucus, when to seek care). Bilingual. Shipped source: `apps/web/lib/learn/articles.ts`. Operator CMS: `learn_articles` in Postgres, merged in `lib/learn/catalog.ts` (DB row wins; draft hides shipped). Do not dump hosting/crypto here.
+- `/learn` — health education in 14 categories (cycle, periods, symptoms, conditions, intimate health, fertility, contraception, pregnancy, sexual health, menopause, mind, lifestyle, puberty, care). Bilingual target: `en` is required, `es` is optional until translated and the Spanish UI falls back to English with an "English only for now" badge. Each article cites sources and may list `related` slugs. Shipped source: `apps/web/lib/learn/content/<category>.ts` (types and helpers in `lib/learn/articles.ts`). Operator CMS: `learn_articles` in Postgres, merged in `lib/learn/catalog.ts` (DB row wins; draft hides shipped). Do not dump hosting/crypto here.
 - `/help` — product/operator docs (hosting, encryption, UI labels, forecast behaviour). English. Source: `apps/web/content/help/*.md` + catalog `apps/web/lib/help/articles.ts`. Public, no wallet.
 - `/privacy` — short user privacy page (ES/EN). Long form: `PRIVACY.md`. Contributor checklist: `docs/privacy.md`.
 - GitHub engineering: README.md, ARCHITECTURE.md, CONTRIBUTING.md, MODEL_CARD.md, DATASETS.md, `docs/modeling.md`, `docs/evaluation.md`, `docs/api.md`, `docs/threat-model.md`.
@@ -85,7 +85,8 @@ apps/web/lib/cycle/phases.ts     observed vs estimated phase heuristic (NOT the 
 apps/web/lib/cycle/season-guide.ts  inner-season copy EN/ES
 apps/web/lib/client/ciclo-context.tsx  wallet + diary in memory
 apps/web/lib/crypto/wallet.ts    BIP39, HKDF, Ed25519, AES-GCM
-apps/web/lib/learn/articles.ts   Learn wiki shipped in code
+apps/web/lib/learn/articles.ts   Learn types, categories, copy fallback helpers (client-safe)
+apps/web/lib/learn/content/      Learn library shipped in code, one file per category. Server-only: pass articles to client components as props
 apps/web/lib/learn/catalog.ts    Merge shipped + learn_articles; public list is published only
 apps/web/lib/i18n.ts             all UI chrome + Learn is separate; Help is markdown
 apps/web/content/help/           Help markdown (canonical)

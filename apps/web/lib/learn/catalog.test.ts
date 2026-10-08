@@ -3,15 +3,23 @@
 
 import { describe, expect, it } from "vitest";
 
-import { LEARN_ARTICLES } from "./articles";
+import type { LearnArticleCopy } from "./articles";
+import { LEARN_ARTICLES } from "./content";
 import {
+  dbRowToCatalogEntry,
+  emptyLearnCopy,
   isPublishReady,
   isSafeLearnHref,
   mergeLearnCatalog,
   type CatalogDbEntry,
 } from "./catalog";
 
-const sampleCopy = LEARN_ARTICLES[0].es;
+const sampleCopy: LearnArticleCopy = {
+  title: "Sample",
+  summary: "Summary",
+  sections: [{ heading: "Heading", body: "Body" }],
+  notice: "Notice",
+};
 
 function dbEntry(overrides: Partial<CatalogDbEntry> & Pick<CatalogDbEntry, "slug" | "status">): CatalogDbEntry {
   return {
@@ -19,7 +27,7 @@ function dbEntry(overrides: Partial<CatalogDbEntry> & Pick<CatalogDbEntry, "slug
     reviewedAt: "2026-09-20",
     sources: [{ label: "NHS", href: "https://www.nhs.uk/" }],
     es: { ...sampleCopy, title: "DB ES" },
-    en: { ...LEARN_ARTICLES[0].en, title: "DB EN" },
+    en: { ...sampleCopy, title: "DB EN" },
     ...overrides,
   };
 }
@@ -31,9 +39,12 @@ describe("learn catalog merge", () => {
     );
   });
 
-  it("lets a published database row replace shipped copy", () => {
+  it("lets a published database row replace shipped copy and keeps shipped related links", () => {
+    const shipped = LEARN_ARTICLES.find((article) => article.slug === "cycle-phases");
     const merged = mergeLearnCatalog(LEARN_ARTICLES, [dbEntry({ slug: "cycle-phases", status: "published" })]);
-    expect(merged.find((article) => article.slug === "cycle-phases")?.es.title).toBe("DB ES");
+    const article = merged.find((item) => item.slug === "cycle-phases");
+    expect(article?.es?.title).toBe("DB ES");
+    expect(article?.related).toEqual(shipped?.related);
   });
 
   it("hides a shipped article when the database row is a draft", () => {
@@ -47,6 +58,28 @@ describe("learn catalog merge", () => {
   });
 });
 
+describe("learn database rows", () => {
+  const row = {
+    slug: "cervical-mucus",
+    category: "cycle",
+    reviewedAt: "2026-09-20",
+    status: "published",
+    sources: [{ label: "NHS", href: "https://www.nhs.uk/" }],
+    copyEs: sampleCopy,
+    copyEn: sampleCopy,
+  };
+
+  it("keeps rows saved under the legacy mucus category", () => {
+    expect(dbRowToCatalogEntry({ ...row, category: "mucus" })?.category).toBe("cycle");
+    expect(dbRowToCatalogEntry({ ...row, category: "unknown" })).toBeNull();
+  });
+
+  it("treats a blank Spanish copy as untranslated", () => {
+    expect(dbRowToCatalogEntry({ ...row, copyEs: emptyLearnCopy() })?.es).toBeUndefined();
+    expect(dbRowToCatalogEntry(row)?.es?.title).toBe("Sample");
+  });
+});
+
 describe("learn href and publish rules", () => {
   it("allows http(s) sources only", () => {
     expect(isSafeLearnHref("https://www.nhs.uk/")).toBe(true);
@@ -54,10 +87,17 @@ describe("learn href and publish rules", () => {
     expect(isSafeLearnHref("/help")).toBe(false);
   });
 
-  it("requires bilingual copy, notice, and a safe source to publish", () => {
+  it("requires English copy, a notice, and a safe source to publish", () => {
     const ready = dbEntry({ slug: "cycle-phases", status: "published" });
     expect(isPublishReady(ready)).toBe(true);
     expect(isPublishReady({ ...ready, sources: [] })).toBe(false);
-    expect(isPublishReady({ ...ready, es: { ...ready.es, notice: "" } })).toBe(false);
+    expect(isPublishReady({ ...ready, en: { ...ready.en, notice: "" } })).toBe(false);
+  });
+
+  it("allows blank Spanish copy but not a half-written translation", () => {
+    const ready = dbEntry({ slug: "cycle-phases", status: "published" });
+    expect(isPublishReady({ ...ready, es: undefined })).toBe(true);
+    expect(isPublishReady({ ...ready, es: emptyLearnCopy() })).toBe(true);
+    expect(isPublishReady({ ...ready, es: { ...sampleCopy, notice: "" } })).toBe(false);
   });
 });

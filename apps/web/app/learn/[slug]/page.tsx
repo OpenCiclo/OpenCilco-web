@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { LearnArticleView } from "@/components/learn/learn-article-view";
+import { relatedArticles } from "@/lib/learn/articles";
 import { loadPublishedLearnArticles } from "@/lib/learn/load";
 
 export const dynamic = "force-dynamic";
@@ -10,5 +11,6 @@ export default async function LearnArticlePage({ params }: { params: Promise<{ s
   const { slug } = await params;
   const articles = await loadPublishedLearnArticles();
   const article = articles.find((item) => item.slug === slug) ?? null;
-  return <LearnArticleView article={article} />;
+  const related = article ? relatedArticles(article, articles) : [];
+  return <LearnArticleView article={article} related={related} />;
 }

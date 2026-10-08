@@ -38,7 +38,7 @@ export function ConsoleLearnList({ items }: { items: ConsoleLearnListItem[] }) {
                   {item.origin === "shipped" ? copy.originShipped : copy.originDatabase}
                 </span>
               </div>
-              <p className="mt-1 font-serif text-xl">{locale === "es" ? item.titleEs : item.titleEn}</p>
+              <p className="mt-1 font-serif text-xl">{(locale === "es" && item.titleEs) || item.titleEn}</p>
               <p className="mt-1 text-sm text-muted-foreground">{item.slug}</p>
             </Link>
           </li>

@@ -61,7 +61,8 @@ const COPY = {
     localeEn: "English",
     saved: "Guardado",
     errorGeneric: "No se pudo guardar",
-    publishBlocked: "Para publicar hace falta título, resumen, aviso y una sección en ES y EN, y al menos una fuente http(s).",
+    publishBlocked:
+      "Para publicar hace falta título, resumen, aviso y una sección en EN, y al menos una fuente http(s). ES puede quedar vacío hasta traducirlo; si lo empiezas, complétalo.",
     backToList: "Volver a Learn",
     confirmDelete: "¿Quitar la fila de la base de datos?",
   },
@@ -123,7 +124,7 @@ const COPY = {
     saved: "Saved",
     errorGeneric: "Could not save",
     publishBlocked:
-      "Publishing needs a title, summary, notice, and one section in ES and EN, plus at least one http(s) source.",
+      "Publishing needs a title, summary, notice, and one section in EN, plus at least one http(s) source. ES can stay empty until translated; if you start it, finish it.",
     backToList: "Back to Learn",
     confirmDelete: "Remove the database row?",
   },

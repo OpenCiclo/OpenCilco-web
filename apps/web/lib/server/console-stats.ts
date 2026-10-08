@@ -3,7 +3,7 @@
 
 import { and, count, gte, gt, lt, ne, notInArray, sql } from "drizzle-orm";
 
-import { LEARN_ARTICLES } from "@/lib/learn/articles";
+import { LEARN_ARTICLES } from "@/lib/learn/content";
 import { mergeLearnCatalog } from "@/lib/learn/catalog";
 import { loadDbLearnEntries } from "@/lib/learn/load";
 import { accountActivityDays, accounts, recoveryMailboxes, researchContributions } from "@/lib/db/schema";

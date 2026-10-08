@@ -4,10 +4,13 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-import { LEARN_ARTICLES, isLearnCategory } from "@/lib/learn/articles";
+import { isLearnCategory } from "@/lib/learn/articles";
+import { LEARN_ARTICLES } from "@/lib/learn/content";
 import {
   dbRowToCatalogEntry,
   emptyLearnArticle,
+  emptyLearnCopy,
+  isBlankLearnCopy,
   isLearnSlug,
   isPublishReady,
   isReviewedAt,
@@ -64,7 +67,7 @@ export async function loadLearnEditorPayload(slug: string): Promise<LearnEditorP
         category: entry.category,
         reviewedAt: entry.reviewedAt,
         sources: entry.sources,
-        es: entry.es,
+        es: entry.es ?? null,
         en: entry.en,
       },
     };
@@ -77,7 +80,14 @@ export async function loadLearnEditorPayload(slug: string): Promise<LearnEditorP
       origin: "shipped",
       hasShipped: true,
       status: "published",
-      article: shipped,
+      article: {
+        slug: shipped.slug,
+        category: shipped.category,
+        reviewedAt: shipped.reviewedAt,
+        sources: shipped.sources,
+        es: shipped.es ?? null,
+        en: shipped.en,
+      },
     };
   }
 
@@ -114,7 +124,7 @@ export function parseUpsertLearnInput(body: UpsertLearnInput): { ok: true; entry
     reviewedAt: body.reviewedAt,
     status: body.status,
     sources: sources.map((source) => ({ label: source.label.trim(), href: source.href.trim() })),
-    es,
+    es: isBlankLearnCopy(es) ? undefined : es,
     en,
   };
   if (entry.status === "published" && !isPublishReady(entry)) {
@@ -132,7 +142,7 @@ export async function upsertLearnArticle(entry: CatalogDbEntry): Promise<void> {
     reviewedAt: entry.reviewedAt,
     status: entry.status,
     sources: entry.sources,
-    copyEs: entry.es,
+    copyEs: entry.es ?? emptyLearnCopy(),
     copyEn: entry.en,
     updatedAt: new Date(),
   };

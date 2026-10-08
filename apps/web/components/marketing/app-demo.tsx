@@ -43,7 +43,7 @@ import {
 import { formatIsoUtc } from "@/lib/format-date";
 import { messages, type Locale } from "@/lib/i18n";
 import { useCiclo } from "@/lib/client/ciclo-context";
-import { LEARN_ARTICLES, articleCopy, type LearnCategory } from "@/lib/learn/articles";
+import { LEARN_CATEGORY_COPY, articleCopy, hasArticleCopy, type LearnArticle } from "@/lib/learn/articles";
 import { lunarDayInfo } from "@/lib/lunar/phases";
 import { patternStats } from "@/lib/patterns/stats";
 import { buildTipContext } from "@/lib/tips/context";
@@ -111,16 +111,9 @@ const TIP_TONE = {
   accent: "border-accent-foreground/15 bg-accent/40",
 } as const;
 
-const CATEGORY_LABELS: Record<LearnCategory, { es: string; en: string }> = {
-  cycle: { es: "Ciclo", en: "Cycle" },
-  symptoms: { es: "Síntomas", en: "Symptoms" },
-  mucus: { es: "Moco cervical", en: "Cervical mucus" },
-  care: { es: "Cuándo consultar", en: "When to seek care" },
-};
-
 type Tab = "calendar" | "patterns" | "learn" | "settings";
 
-export function AppDemo({ locale }: { locale: Locale }) {
+export function AppDemo({ locale, learnArticles }: { locale: Locale; learnArticles: LearnArticle[] }) {
   const t = messages[locale];
   const { weekStartsOn } = useCiclo();
   const today = useMemo(() => todayIsoUtc(), []);
@@ -274,7 +267,7 @@ export function AppDemo({ locale }: { locale: Locale }) {
               maxLen={maxLen}
             />
           ) : tab === "learn" ? (
-            <LearnTab t={t} locale={locale} />
+            <LearnTab t={t} locale={locale} articles={learnArticles} />
           ) : (
             <SettingsTab
               t={t}
@@ -747,7 +740,7 @@ function PatternsTab({
   );
 }
 
-function LearnTab({ t, locale }: { t: Messages; locale: Locale }) {
+function LearnTab({ t, locale, articles }: { t: Messages; locale: Locale; articles: LearnArticle[] }) {
   return (
     <div className="flex flex-col gap-2.5">
       <div>
@@ -758,15 +751,16 @@ function LearnTab({ t, locale }: { t: Messages; locale: Locale }) {
             : "Short, source-cited guides. Education, not diagnosis."}
         </p>
       </div>
-      {LEARN_ARTICLES.map((article) => {
+      {articles.map((article) => {
         const copy = articleCopy(article, locale);
+        const lang = hasArticleCopy(article, locale) ? undefined : "en";
         return (
           <div key={article.slug} className="rounded-2xl bg-card p-3 shadow-sm">
             <span className="inline-flex rounded-full bg-secondary px-2 py-0.5 text-[8px] font-semibold text-secondary-foreground uppercase">
-              {CATEGORY_LABELS[article.category][locale]}
+              {t[LEARN_CATEGORY_COPY[article.category].title]}
             </span>
-            <p className="mt-1.5 font-serif text-[13px] leading-tight text-card-foreground">{copy.title}</p>
-            <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground text-pretty">{copy.summary}</p>
+            <p lang={lang} className="mt-1.5 font-serif text-[13px] leading-tight text-card-foreground">{copy.title}</p>
+            <p lang={lang} className="mt-1 text-[10px] leading-relaxed text-muted-foreground text-pretty">{copy.summary}</p>
             <span className="mt-1.5 inline-flex items-center gap-0.5 text-[10px] font-semibold text-primary">
               {locale === "es" ? "Leer" : "Read"}
               <ChevronRight className="size-3" aria-hidden />
