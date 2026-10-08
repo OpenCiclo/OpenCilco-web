@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 
 type LocaleTab = "es" | "en";
 
-function asArticle(payload: LearnEditorPayload): LearnArticle {
+function asArticle(payload: LearnEditorPayload): LearnArticle & { es: LearnArticleCopy } {
   const article = payload.article;
   return {
     slug: article.slug,

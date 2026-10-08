@@ -1,7 +1,7 @@
 // Copyright © 2026 Emma Flora Harbison & Luis Rey Sánchez
 // SPDX-License-Identifier: Apache-2.0
 
-import { LEARN_ARTICLES } from "@/lib/learn/articles";
+import { LEARN_ARTICLES } from "@/lib/learn/content";
 import { dbRowToCatalogEntry, mergeLearnCatalog, type CatalogDbEntry } from "@/lib/learn/catalog";
 import { learnArticles } from "@/lib/db/schema";
 import { getDb } from "@/lib/db";

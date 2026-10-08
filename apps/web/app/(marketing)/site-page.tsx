@@ -21,7 +21,7 @@ import {
 
 import { useCiclo } from "@/lib/client/ciclo-context";
 import { marketingCopy, MARKETING_LINKS } from "@/lib/marketing/copy";
-import { articleCopy, type LearnArticle } from "@/lib/learn/articles";
+import { articleCopy, hasArticleCopy, type LearnArticle } from "@/lib/learn/articles";
 import { Reveal } from "@/components/marketing/reveal";
 import { AppDemo } from "@/components/marketing/app-demo";
 import { GithubMark } from "@/components/marketing/github-mark";
@@ -100,7 +100,7 @@ export function SitePage({ featured }: { featured: LearnArticle[] }) {
           </div>
 
                 <div className="flex w-full justify-center lg:justify-end lg:pb-0 lg:[margin-bottom:-2.5rem]">
-                  <AppDemo locale={locale} />
+                  <AppDemo locale={locale} learnArticles={featured} />
                 </div>
         </div>
       </section>
@@ -214,6 +214,7 @@ export function SitePage({ featured }: { featured: LearnArticle[] }) {
           <div className="mt-10 grid gap-4 md:grid-cols-3">
             {featured.map((article, index) => {
               const article_copy = articleCopy(article, locale);
+              const article_lang = hasArticleCopy(article, locale) ? undefined : "en";
               return (
                 <Reveal key={article.slug} delay={index * 70} as="div">
                   <Link
@@ -221,8 +222,8 @@ export function SitePage({ featured }: { featured: LearnArticle[] }) {
                     className="flex h-full flex-col gap-2 rounded-3xl border border-border bg-card p-6 shadow-sm transition-transform hover:-translate-y-1"
                   >
                     <BookOpen className="size-5 text-primary" />
-                    <h3 className="mt-1 font-serif text-xl text-card-foreground">{article_copy.title}</h3>
-                    <p className="text-sm leading-relaxed text-muted-foreground">{article_copy.summary}</p>
+                    <h3 lang={article_lang} className="mt-1 font-serif text-xl text-card-foreground">{article_copy.title}</h3>
+                    <p lang={article_lang} className="text-sm leading-relaxed text-muted-foreground">{article_copy.summary}</p>
                   </Link>
                 </Reveal>
               );

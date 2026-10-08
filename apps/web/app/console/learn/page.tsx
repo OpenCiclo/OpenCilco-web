@@ -3,7 +3,7 @@
 
 import { ConsoleForbidden } from "@/components/console/console-forbidden";
 import { ConsoleLearnList } from "@/components/console/console-learn-list";
-import { LEARN_ARTICLES } from "@/lib/learn/articles";
+import { LEARN_ARTICLES } from "@/lib/learn/content";
 import { listLearnForConsole } from "@/lib/learn/catalog";
 import { loadDbLearnEntries } from "@/lib/learn/load";
 import { requireConsolePage } from "@/lib/server/console";

@@ -1,7 +1,7 @@
 // Copyright © 2026 Emma Flora Harbison & Luis Rey Sánchez
 // SPDX-License-Identifier: Apache-2.0
 
-import { LEARN_ARTICLES } from "@/lib/learn/articles";
+import { LEARN_ARTICLES } from "@/lib/learn/content";
 import { listLearnForConsole } from "@/lib/learn/catalog";
 import { loadDbLearnEntries } from "@/lib/learn/load";
 import { requireConsoleApi } from "@/lib/server/console";

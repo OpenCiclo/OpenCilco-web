@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-  isLearnCategory,
+  normalizeLearnCategory,
   type LearnArticle,
   type LearnArticleCopy,
   type LearnCategory,
@@ -19,7 +19,8 @@ export type CatalogDbEntry = {
   reviewedAt: string;
   status: LearnStatus;
   sources: LearnSource[];
-  es: LearnArticleCopy;
+  // Undefined while untranslated; stored as a blank copy because copy_es is NOT NULL.
+  es?: LearnArticleCopy;
   en: LearnArticleCopy;
 };
 
@@ -55,7 +56,7 @@ export function emptyLearnCopy(): LearnArticleCopy {
   };
 }
 
-export function emptyLearnArticle(slug = ""): LearnArticle {
+export function emptyLearnArticle(slug = ""): LearnArticle & { es: LearnArticleCopy } {
   return {
     slug,
     category: "cycle",
@@ -109,15 +110,22 @@ function copyIsPublishable(copy: LearnArticleCopy): boolean {
   return copy.sections.some((section) => section.heading.trim() && section.body.trim());
 }
 
+export function isBlankLearnCopy(copy: LearnArticleCopy): boolean {
+  if (copy.title.trim() || copy.summary.trim() || copy.notice.trim()) return false;
+  return copy.sections.every((section) => !section.heading.trim() && !section.body.trim());
+}
+
+// English is required. Spanish may stay blank until translated, but a started translation must be complete.
 export function isPublishReady(article: {
   sources: LearnSource[];
-  es: LearnArticleCopy;
+  es?: LearnArticleCopy;
   en: LearnArticleCopy;
 }): boolean {
   const sources = article.sources.filter((source) => source.label.trim() && source.href.trim());
   if (sources.length < 1) return false;
   if (!sources.every((source) => isSafeLearnHref(source.href.trim()))) return false;
-  return copyIsPublishable(article.es) && copyIsPublishable(article.en);
+  if (!copyIsPublishable(article.en)) return false;
+  return !article.es || isBlankLearnCopy(article.es) || copyIsPublishable(article.es);
 }
 
 export function catalogEntryToArticle(entry: CatalogDbEntry): LearnArticle {
@@ -144,7 +152,8 @@ export function mergeLearnCatalog(shipped: LearnArticle[], dbRows: CatalogDbEntr
       continue;
     }
     if (override.status === "published") {
-      published.push(catalogEntryToArticle(override));
+      // The CMS does not edit related links, so keep the shipped ones.
+      published.push({ ...catalogEntryToArticle(override), related: article.related });
     }
   }
 
@@ -167,7 +176,7 @@ export function listLearnForConsole(shipped: LearnArticle[], dbRows: CatalogDbEn
     if (row) {
       items.push({
         slug: article.slug,
-        titleEs: row.es.title || article.es.title,
+        titleEs: row.es?.title || article.es?.title || "",
         titleEn: row.en.title || article.en.title,
         category: row.category,
         status: row.status,
@@ -178,7 +187,7 @@ export function listLearnForConsole(shipped: LearnArticle[], dbRows: CatalogDbEn
     }
     items.push({
       slug: article.slug,
-      titleEs: article.es.title,
+      titleEs: article.es?.title ?? "",
       titleEn: article.en.title,
       category: article.category,
       status: "published",
@@ -191,7 +200,7 @@ export function listLearnForConsole(shipped: LearnArticle[], dbRows: CatalogDbEn
     if (seen.has(row.slug)) continue;
     items.push({
       slug: row.slug,
-      titleEs: row.es.title,
+      titleEs: row.es?.title ?? "",
       titleEn: row.en.title,
       category: row.category,
       status: row.status,
@@ -213,18 +222,19 @@ export function dbRowToCatalogEntry(row: {
   copyEn: unknown;
 }): CatalogDbEntry | null {
   if (row.status !== "draft" && row.status !== "published") return null;
-  if (!isLearnCategory(row.category)) return null;
+  const category = normalizeLearnCategory(row.category);
+  if (!category) return null;
   const sources = parseLearnSources(row.sources);
   const es = parseLearnArticleCopy(row.copyEs);
   const en = parseLearnArticleCopy(row.copyEn);
   if (!sources || !es || !en) return null;
   return {
     slug: row.slug,
-    category: row.category,
+    category,
     reviewedAt: row.reviewedAt,
     status: row.status,
     sources,
-    es,
+    es: isBlankLearnCopy(es) ? undefined : es,
     en,
   };
 }

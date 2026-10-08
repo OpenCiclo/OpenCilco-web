@@ -6,19 +6,12 @@
 import Link from "next/link";
 
 import { AppShell } from "@/components/app-shell";
+import { Badge } from "@/components/ui/badge";
 import { useCiclo } from "@/lib/client/ciclo-context";
-import { articleCopy, type LearnArticle, type LearnCategory } from "@/lib/learn/articles";
+import { LEARN_CATEGORY_COPY, articleCopy, hasArticleCopy, type LearnArticle } from "@/lib/learn/articles";
 import { formatIsoUtc } from "@/lib/format-date";
-import type { Messages } from "@/lib/i18n";
 
-const CATEGORY_KEYS: Record<LearnCategory, keyof Messages> = {
-  cycle: "learnCategoryCycle",
-  symptoms: "learnCategorySymptoms",
-  mucus: "learnCategoryMucus",
-  care: "learnCategoryCare",
-};
-
-export function LearnArticleView({ article }: { article: LearnArticle | null }) {
+export function LearnArticleView({ article, related }: { article: LearnArticle | null; related: LearnArticle[] }) {
   const { t, locale } = useCiclo();
   if (!article) {
     return (
@@ -30,6 +23,7 @@ export function LearnArticleView({ article }: { article: LearnArticle | null }) 
     );
   }
   const copy = articleCopy(article, locale);
+  const lang = hasArticleCopy(article, locale) ? undefined : "en";
 
   return (
     <AppShell>
@@ -39,21 +33,22 @@ export function LearnArticleView({ article }: { article: LearnArticle | null }) 
             {t.backToLearn}
           </Link>
           <p className="mt-3 text-xs font-semibold tracking-wide text-primary uppercase">
-            {t[CATEGORY_KEYS[article.category]]}
+            {t[LEARN_CATEGORY_COPY[article.category].title]}
           </p>
-          <h1 className="mt-1 font-serif text-3xl leading-tight text-foreground">{copy.title}</h1>
+          <h1 lang={lang} className="mt-1 font-serif text-3xl leading-tight text-foreground">{copy.title}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {t.learnReviewed}: {formatIsoUtc(article.reviewedAt, locale, { day: "numeric", month: "long", year: "numeric" })}
           </p>
+          {lang ? <Badge className="mt-2">{t.learnEnglishOnly}</Badge> : null}
         </header>
-        <p className="text-sm leading-relaxed text-muted-foreground">{copy.summary}</p>
+        <p lang={lang} className="text-sm leading-relaxed text-muted-foreground">{copy.summary}</p>
         {copy.sections.map((section) => (
-          <section key={section.heading} className="rounded-3xl bg-card p-5 shadow-sm">
+          <section key={section.heading} lang={lang} className="rounded-3xl bg-card p-5 shadow-sm">
             <h2 className="font-serif text-lg text-card-foreground">{section.heading}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{section.body}</p>
           </section>
         ))}
-        <p className="rounded-3xl border border-primary/20 bg-primary/8 p-4 text-sm leading-relaxed text-muted-foreground">
+        <p lang={lang} className="rounded-3xl border border-primary/20 bg-primary/8 p-4 text-sm leading-relaxed text-muted-foreground">
           {copy.notice}
         </p>
         <section>
@@ -68,6 +63,24 @@ export function LearnArticleView({ article }: { article: LearnArticle | null }) 
             ))}
           </ul>
         </section>
+        {related.length > 0 ? (
+          <section>
+            <h2 className="font-serif text-lg text-foreground">{t.learnRelated}</h2>
+            <ul className="mt-2 flex flex-col gap-2">
+              {related.map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/learn/${item.slug}`}
+                    lang={hasArticleCopy(item, locale) ? undefined : "en"}
+                    className="block rounded-3xl bg-card p-4 font-serif text-base text-card-foreground shadow-sm transition-transform active:scale-[0.99]"
+                  >
+                    {articleCopy(item, locale).title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </article>
     </AppShell>
   );
